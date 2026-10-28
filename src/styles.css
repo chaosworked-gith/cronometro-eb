@@ -1165,6 +1165,614 @@ input[type='checkbox'] {
   font-size: 13px;
 }
 
+/* ---------- Meu Cronômetro ---------- */
+.cronometro-grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.cronometro-principal {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.cartao-cronometro {
+  overflow: hidden;
+}
+
+/* Visor: gradiente principal com o Pattern_EB a 15% nas laterais */
+.visor {
+  position: relative;
+  overflow: hidden;
+  padding: 24px 24px 16px;
+  background: var(--gradiente-principal);
+  color: var(--branco);
+}
+
+.visor::before,
+.visor::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 96px;
+  background: url('/marca/patterns/Pattern_EB_faixa.png') left top / 100% auto repeat-y;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.visor::before {
+  left: 0;
+  transform: scaleX(-1);
+}
+
+.visor::after {
+  right: 0;
+}
+
+.visor > * {
+  position: relative;
+  z-index: 1;
+}
+
+.visor-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 14px;
+}
+
+.visor-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--raio-pilula);
+  background: rgba(255, 255, 255, 0.16);
+  font-weight: 700;
+}
+
+.visor-pulso {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--branco);
+  animation: piscar 1.6s ease-in-out infinite;
+}
+
+.visor-hoje {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.visor-nome {
+  margin-top: 16px;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.visor-tipo {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+}
+
+/* Klavika Bold; sem o arquivo, Lato Black */
+.visor-tempo {
+  margin-top: 8px;
+  font-family: var(--fonte-destaque);
+  font-weight: 900;
+  font-size: clamp(56px, 10vw, 104px);
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.visor-sessao {
+  min-height: 24px;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+}
+
+/* Linha de circuito: acende com brilho sutil enquanto o cronômetro roda */
+.circuito {
+  position: relative;
+  height: 3px;
+  margin: 0 24px;
+  background: var(--borda);
+  transition: background var(--transicao), box-shadow var(--transicao);
+}
+
+.circuito::before,
+.circuito::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--borda);
+  border-radius: 50%;
+  background: var(--branco);
+}
+
+.circuito::before {
+  left: -4px;
+}
+
+.circuito::after {
+  right: -4px;
+}
+
+.circuito.ligado {
+  background: var(--azul-brilhante);
+  box-shadow: var(--brilho-circuito);
+  animation: brilhar 2s ease-in-out infinite;
+}
+
+.circuito.ligado::before,
+.circuito.ligado::after {
+  border-color: var(--azul-brilhante);
+  background: var(--azul-brilhante);
+  box-shadow: var(--brilho-circuito);
+}
+
+@keyframes brilhar {
+  50% {
+    box-shadow: 0 0 14px rgba(0, 55, 255, 0.9);
+  }
+}
+
+@keyframes piscar {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.cronometro-controles {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+.btn-trocar {
+  align-self: flex-start;
+}
+
+.trocando-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--azul-marinho);
+}
+
+.legenda-iniciar {
+  color: var(--texto-secundario);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.botoes-cronometro {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.btn-acao {
+  height: 56px;
+  font-size: 17px;
+  color: var(--branco);
+}
+
+.btn-acao:disabled {
+  opacity: 0.4;
+}
+
+.btn-iniciar {
+  background: var(--azul-brilhante);
+}
+
+.btn-pausar {
+  background: var(--azul-medio);
+}
+
+.btn-concluir {
+  background: var(--azul-marinho);
+}
+
+.cronometro-rodape {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+/* Nome da demanda com busca nas demandas em aberto */
+.form-demanda {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.combo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.combo-campo {
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--branco);
+  font-size: 17px;
+  transition: border-color var(--transicao), box-shadow var(--transicao);
+}
+
+.combo-campo::placeholder {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.combo-campo:focus {
+  outline: none;
+  border-color: var(--azul-brilhante);
+  box-shadow: 0 0 0 3px rgba(0, 55, 255, 0.2);
+}
+
+.combo-lista {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 340px;
+  margin: 4px 0 0;
+  padding: 8px 0;
+  overflow-y: auto;
+  list-style: none;
+  border-radius: var(--raio);
+  background: var(--branco);
+  box-shadow: var(--sombra-janela);
+}
+
+.combo-titulo {
+  padding: 4px 16px 8px;
+  color: var(--texto-secundario);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.combo-opcao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.combo-opcao.destaque {
+  background: var(--linha-alternada);
+}
+
+.combo-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.combo-texto strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.retomar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  padding: 16px;
+  border-radius: var(--raio);
+  background: var(--linha-alternada);
+}
+
+.retomar > div {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.retomar-rotulo {
+  color: var(--azul-brilhante);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.regra-aplicada {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--raio);
+  background: var(--linha-alternada);
+  color: var(--azul-marinho);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.campos-demanda {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.campo-largo {
+  grid-column: span 2;
+}
+
+.estimativa {
+  align-self: end;
+  color: var(--texto-secundario);
+  font-size: 14px;
+}
+
+.campo input[type='date'] {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--branco);
+}
+
+/* Sim e Não como pílulas */
+.alternador {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.alternador legend {
+  margin-bottom: 4px;
+  padding: 0;
+  color: var(--azul-marinho);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.alternador-opcoes {
+  display: flex;
+  height: 40px;
+  padding: 3px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pilula);
+}
+
+.alternador-opcoes label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--raio-pilula);
+  color: var(--azul-marinho);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transicao), color var(--transicao);
+}
+
+.alternador-opcoes label.ativo {
+  background: var(--azul-marinho);
+  color: var(--branco);
+}
+
+.alternador-opcoes label:has(input:focus-visible) {
+  outline: 2px solid var(--azul-medio);
+  outline-offset: 2px;
+}
+
+/* Etiquetas de situação */
+.situacao-em_andamento {
+  background: var(--situacao-andamento);
+  color: var(--branco);
+}
+
+.situacao-pausada {
+  background: var(--situacao-pausada);
+  color: var(--branco);
+}
+
+.situacao-concluida {
+  background: var(--situacao-concluida);
+  color: var(--branco);
+}
+
+/* Minhas demandas de hoje */
+.lista-hoje {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-hoje li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--borda);
+}
+
+.lista-hoje li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.lista-hoje-texto {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.lista-hoje-tempo {
+  color: var(--azul-marinho);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.lista-hoje li.rodando .lista-hoje-tempo {
+  color: var(--azul-brilhante);
+}
+
+.vazio-mascote {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.vazio-mascote img {
+  flex-shrink: 0;
+  width: auto;
+  height: 180px;
+}
+
+.vazio-mascote strong {
+  display: block;
+  color: var(--azul-marinho);
+  font-size: 18px;
+}
+
+/* Equipe agora */
+.equipe-agora {
+  position: sticky;
+  top: 24px;
+}
+
+.badge-azul {
+  background: var(--azul-brilhante);
+}
+
+.lista-equipe {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-equipe li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 7px;
+  border-radius: 50%;
+  background: var(--linha-alternada);
+  object-fit: contain;
+}
+
+.equipe-texto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.equipe-texto strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.equipe-demanda {
+  overflow-wrap: anywhere;
+}
+
+.equipe-tempo {
+  color: var(--azul-brilhante);
+  font-weight: 700;
+}
+
+.equipe-parados {
+  padding-top: 12px;
+  border-top: 1px solid var(--borda);
+}
+
+@media (max-width: 960px) {
+  .cronometro-grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .equipe-agora {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .visor {
+    padding: 16px 16px 12px;
+  }
+
+  .visor::before,
+  .visor::after {
+    width: 56px;
+  }
+
+  .circuito {
+    margin: 0 16px;
+  }
+
+  .cronometro-controles {
+    padding: 16px;
+  }
+
+  .botoes-cronometro {
+    gap: 8px;
+  }
+
+  .btn-acao {
+    padding: 0 8px;
+    font-size: 15px;
+  }
+
+  .campos-demanda {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .campo-largo {
+    grid-column: auto;
+  }
+
+  .vazio-mascote img {
+    height: 140px;
+  }
+}
+
 /* ---------- Celular ---------- */
 @media (max-width: 760px) {
   .cabecalho {

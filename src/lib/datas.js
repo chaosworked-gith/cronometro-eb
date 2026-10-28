@@ -30,6 +30,18 @@ export function formatarDataHora(valor) {
 // Datas de demandas (solicitação, ajuste, entrega) são guardadas como texto "AAAA-MM-DD",
 // sem hora, para não depender de fuso.
 
+const formatoDiaISO = new Intl.DateTimeFormat('en-CA', {
+  timeZone: FUSO,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+// Dia na Bahia ("AAAA-MM-DD") de um momento: Date, milissegundos ou Timestamp do Firestore.
+export function diaISO(valor = new Date()) {
+  return formatoDiaISO.format(paraDate(valor) ?? new Date());
+}
+
 export function dataISO(ano, mes, dia) {
   const data = new Date(Date.UTC(ano, mes - 1, dia));
   if (data.getUTCFullYear() !== ano || data.getUTCMonth() !== mes - 1 || data.getUTCDate() !== dia) return null;

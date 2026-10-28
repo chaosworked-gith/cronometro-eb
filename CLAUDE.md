@@ -280,11 +280,12 @@ A importação usa a mesma planilha. Conferir o formato das datas e das colunas 
 - `src/lib/datas.js`: datas no fuso `America/Bahia`, datas `"AAAA-MM-DD"` (`dataISO`, `diasEntre`, `formatarData`, `rotuloMes`). `src/lib/erros.js`: mensagens de erro em português.
 - `src/lib/tempo.js`: `formatarHMS`, `lerHMS`, conversão entre horas e segundos.
 - `src/lib/texto.js`: `normalizar` (sem maiúsculas, acentos e espaços repetidos) e `ordenarPorTexto`.
-- `src/lib/regras.js`: opções de Solicitante e Público, `calcularEconomizado` e `calcularPrazo`.
+- `src/lib/regras.js`: opções de Solicitante e Público, `calcularEconomizado`, `calcularPrazo`, `sugerirTipo` (palavras-chave), `regraAutomatica` (Trello, Reunião de Setor, Claude), `ehAlmoco` e `TIPO_ALMOCO`.
 - `src/lib/planilha.js`: leitura da planilha (não grava nada e não depende do Firebase; recebe o módulo do SheetJS, então dá para testar no Node).
 - `src/lib/marca.js`: `urlMarca(caminho)` para os arquivos de `public/marca/`.
-- `src/hooks/`: `useColecao` (coleção em tempo real), `useAviso` (aviso que some sozinho; erros ficam), `usePedidosAcesso`.
-- `src/componentes/`: Layout (cabeçalho, menu e rodapé), Logo, Modal, Confirmar, Aviso, Carregando, EtiquetaPapel.
+- `src/hooks/`: `useColecao` (coleção em tempo real), `useConsulta` (consulta só com igualdades), `useDocumento` (um documento), `useAgora` (relógio de 1 segundo), `useAviso` (aviso que some sozinho; erros ficam), `usePedidosAcesso`. Todos leem `serverTimestamp` pendente como estimativa.
+- `src/componentes/`: Layout (cabeçalho, menu e rodapé), Logo, Modal, Confirmar, Aviso, Carregando, EtiquetaPapel, EtiquetaSituacao.
+- `src/telas/cronometro/`: `MeuCronometro.jsx` (página), `Visor.jsx`, `FormDemanda.jsx` (nome com busca e campos), `ListaHoje.jsx`, `EquipeAgora.jsx`, `novaDemanda.js` (monta e valida a demanda nova) e `acoes.js` (iniciar, pausar, concluir, almoço).
 - `src/telas/`: Login, EmBreve e `admin/`:
   - `Administracao.jsx`: moldura com as abas Pessoas (`/administracao`), Tipos e palavras-chave (`/administracao/tabelas`) e Importar planilha (`/administracao/importar`).
   - `Pessoas.jsx` e `FormMembro.jsx`: membros e pedidos de acesso.
@@ -319,10 +320,25 @@ Importação da planilha (Fase 2):
 - Gravação em lotes de 200. Se der erro no meio, o aviso diz quantos registros chegaram a ser gravados.
 - Renomear um tipo atualiza as palavras-chave ligadas a ele; remover um tipo remove as palavras-chave ligadas. As demandas nunca mudam com isso.
 
+Meu Cronômetro (Fase 3):
+
+- `cronometros/{email}`: `{ demandaId, inicio, rodando }`. Rodando: `inicio` é `serverTimestamp` do começo da sessão. Pausado: `rodando: false`, `inicio: null` e `demandaId` da demanda pausada (ela continua como "atual" no visor). Sem demanda atual (depois de concluir): `demandaId: null`.
+- O tempo na tela é `tempoGastoSeg` da demanda mais (agora menos `inicio`), usando o relógio do aparelho. Fechar a aba ou trocar de computador não perde nada.
+- Toda ação grava a demanda e o `cronometros/{email}` no mesmo lote. Iniciar outra demanda pausa a atual (fecha a sessão dela).
+- Sessão: `{ inicio, fim, seg }` com `Timestamp` do aparelho no `fim` (o Firestore não aceita `serverTimestamp` dentro de listas). Ao pausar ou concluir: soma `seg` em `tempoGastoSeg`, recalcula economizados e prazo, e `dataEntrega` vira hoje.
+- `dataEntrega` é o último dia trabalhado: muda para hoje ao iniciar, retomar, pausar e concluir. Por isso "Minhas demandas de hoje" é a consulta `responsavelEmail == eu` e `dataEntrega == hoje`.
+- Retomar uma demanda que já tem tempo registra o dia em `datasAjuste` (sem repetir). A primeira sessão de uma demanda nova não conta como ajuste.
+- Nome digitado igual (sem maiúsculas e acentos) ao de uma demanda em aberto da pessoa retoma essa demanda; nunca cria outra. Demandas concluídas com o mesmo nome não contam.
+- Demanda nova: `numero` = maior número da pessoa no mês + 1; `mes` do dia de hoje. Tipo sugerido pela palavra-chave que aparece no começo de uma palavra do nome ("card" acha "Cards"); se várias combinam, vale a mais longa. Regras de Trello e Claude valem com a palavra inteira ("Claudete" não conta). Sem regra: Uso de IA Não, Template Não, Solicitante Marketing. O que a pessoa muda à mão sempre vale sobre a sugestão.
+- Almoço: cria "Almoço" com o tipo Horário do Almoço. O almoço nunca fica pausado: quando termina (pausar, iniciar outra ou concluir), é concluído.
+- Consultas só com igualdades, para não precisar de índice composto: demandas `status == em_andamento` (equipe toda, usada também para "Equipe agora"), demandas da pessoa com `status == pausada`, demandas da pessoa com `dataEntrega == hoje`, e coleções `cronometros`, `membros`, `tipos`, `palavrasChave`.
+- "Equipe agora" mostra só quem está com cronômetro rodando, com o tempo da sessão atual; o resto aparece em "Sem cronômetro agora".
+
 ## Estado atual
 
 - Fase 1 pronta: projeto React + Vite + Firebase, login com Google, pedido de acesso, cabeçalho e menu por papel, tela de Administração. As outras telas aparecem como "em breve".
 - Fase 1 enviada para a `main` no GitHub. Commits deste repositório assinados como "Ivie" <ivie.cidreira@eletricabahiana.com.br> (configurado só neste repositório).
 - Visual refeito com a identidade #EnergiaBahiana 2026 (login, cabeçalho, menu, Administração, telas em breve).
 - Fase 2 pronta: importação da planilha e edição de tipos e palavras-chave na Administração. Testada com a planilha real e um Firestore simulado; a importação no Firestore de verdade ainda não foi feita.
+- Fase 3 pronta: tela Meu Cronômetro (visor, busca para retomar, preenchimento automático, Iniciar, Pausar, Concluir, Almoço, demandas de hoje e Equipe agora). Testada com um Firestore simulado.
 - Faltam os arquivos da Klavika em `public/fontes/`. Enquanto não existirem, os títulos usam Lato Black.

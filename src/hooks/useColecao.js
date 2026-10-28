@@ -12,7 +12,7 @@ export default function useColecao(nome, ordenar) {
       onSnapshot(
         collection(db, nome),
         (snap) => {
-          const lista = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
+          const lista = snap.docs.map((d) => ({ ...d.data({ serverTimestamps: 'estimate' }), id: d.id }));
           setItens(ordenar ? lista.sort(ordenar) : lista);
           setErro(false);
         },
