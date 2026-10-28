@@ -61,35 +61,59 @@ Já feito no console:
 - Regras de segurança publicadas. Cópia guardada em `firestore.rules`: é a referência para as permissões da interface, mas quem vale é o que está publicado no console. Se as regras mudarem, entregar o texto para colar no console e atualizar a cópia.
 - Coleção `membros` cadastrada.
 
-## Identidade visual (Endomarketing EB 2026)
+## Identidade visual (Endomarketing EB #EnergiaBahiana 2026)
 
-| Cor | Hex | Uso |
+### Paleta
+
+Só estas 7 cores, nenhuma outra em fundos, textos, bordas, ícones ou gráficos:
+
+| Hex | Nome | Uso |
 |---|---|---|
-| Navy | `#0B2156` | Primária, cabeçalho |
-| Amarelo | `#F5C200` | Destaques, botão Iniciar |
-| Laranja | `#E8600A` | Etiquetas, alertas |
-| Branco | `#FFFFFF` | |
-| Fundo claro | `#F4F6FA` | Fundo da aplicação |
-| Cinza | `#8694AB` | Texto secundário |
-| Texto | `#0A1929` | Texto principal |
+| `#001780` | Azul Marinho EB | Cabeçalho, fundos institucionais, títulos, cabeçalhos de tabela |
+| `#0037ff` | Azul Brilhante EB | Botões principais, destaques, cronômetro rodando |
+| `#4069ff` | Azul Médio EB | Elementos secundários, texto sobre fundo escuro |
+| `#d4121a` | Vermelho EB | Alertas, erros, botão de parar, avisos de campo faltando |
+| `#a92a2e` | Vermelho Escuro EB | Hover e variação do vermelho |
+| `#ffffff` | Branco | Fundos de conteúdo, texto sobre escuro |
+| `#000000` | Preto | Texto sobre fundo claro |
 
-Fontes (Google Fonts):
+- Tons claros só como transparência dessas cores (ex.: `#4069ff` a 10% para linhas alternadas de tabela e fundos de cartão).
+- Proibido amarelo, laranja, cinza, verde ou outros azuis.
+- Gradiente principal: `linear-gradient(135deg, #001780 0%, #0037ff 60%, #4069ff 100%)`.
+- Gradiente vermelho: `linear-gradient(135deg, #a92a2e 0%, #d4121a 100%)`.
+- Gradiente premium: `linear-gradient(135deg, #000000 0%, #001780 100%)`.
+- Cores de situação: em andamento `#0037ff`, pausada `#4069ff`, concluída `#001780`, alerta `#d4121a`.
 
-- **Barlow Condensed**: títulos. Números do cronômetro em ExtraBold (800).
-- **Barlow**: interface.
-- **JetBrains Mono**: códigos e tempos em tabelas.
+### Fontes
 
-Medidas e efeitos:
+- **Lato** (Google Fonts, pesos 300, 400, 700 e 900) para toda a interface.
+- **Klavika** para títulos de destaque e números do cronômetro, carregada com `@font-face` de `public/fontes/klavika-bold.otf`, `klavika-medium.otf` e `klavika-light.otf`, sempre com Lato Black como alternativa se o arquivo não existir.
+
+### Logos
+
+- Logos oficiais em `public/marca/logos/`:
+  - `Logotipo_Horizontal_Branco.png` e `Logotipo_Vertical_Branco.png` sobre fundo escuro.
+  - `Logotipo_Horizontal_Azul.png` e `Logotipo_Vertical_Azul.png` sobre fundo claro.
+  - `Icone_Branco.png` e `Icone_Azul.png` em espaços pequenos.
+- Nunca recriar o logo em texto, nunca aplicar sombra, rotação ou mudança de cor no logo.
+- `Icone_Azul.png` é o favicon.
+
+### Patterns, mascotes e conceito
+
+- Patterns em `public/marca/patterns/`: Pattern_EB (circuito) para fundos de impacto, como a tela de login; Pattern_Endomarketing (ondas) para fundos discretos. Usar sobre o gradiente principal com opacidade de 10 a 20%.
+- Mascotes em `public/marca/mascotes/` (`Mascote_Ebinho.png` e `Mascote_Ebinha.png`): só em momentos leves, como a tela de login, telas vazias ("nenhuma demanda hoje") e mensagens de boas-vindas. Nunca no Painel da diretoria. Usar como estão, sem recolorir ou distorcer.
+- Conceito visual: circuito elétrico; linhas finas em `#0037ff` com brilho sutil podem ligar elementos.
+- Hashtag `#EnergiaBahiana` em Lato Black, sempre com essa grafia, no rodapé.
+
+### Medidas e efeitos
 
 - Grade de 8px.
 - Raios: 4px etiquetas, 8px cartões e botões, 16px janelas, 100px pílulas.
-- Sombra de cartão: `0 2px 8px rgba(11,33,86,0.10)`.
-- Sombra de janela: `0 8px 24px rgba(11,33,86,0.16)`.
-- Transições: `200ms ease-out`.
-- Hover de botão: `filter: brightness(0.92)` e `transform: translateY(-1px)`.
-- Hover de cartão: `transform: translateY(-4px)`.
-- Logo: `public/logo.svg` (ainda não está no repositório). Aparece sempre sobre fundo navy (login e cabeçalho), então deve ser a versão para fundo escuro. Enquanto o arquivo não existir, o componente `Logo` mostra o texto "Elétrica Bahiana".
-- Tom: direto, próximo, energético. Slogan: "Mais forte por você!"
+- Sombra de cartão: `0 2px 8px rgba(0,23,128,0.10)`. Janelas: `0 8px 24px rgba(0,23,128,0.16)`.
+- Transições de `200ms ease-out`.
+- Hover de botão: `brightness(0.92)` e `translateY(-1px)`. Hover de cartão: `translateY(-4px)`.
+- Ícones Lucide, em cores da paleta.
+- Tom: empolgante, humano, direto, orgulho baiano. Assinatura "Mais forte por você!".
 
 ## Equipe
 
@@ -245,9 +269,18 @@ A importação usa a mesma planilha. Conferir o formato das datas e das colunas 
 - `src/permissoes.js`: domínio, papéis, rótulos e `podeEscrever(papel)`.
 - `src/navegacao.js`: telas do menu, quem vê cada uma e a tela inicial do papel.
 - `src/lib/datas.js`: datas no fuso `America/Bahia`. `src/lib/erros.js`: mensagens de erro em português.
-- `src/componentes/`: Layout (cabeçalho e menu), Logo, Modal, Confirmar, Aviso, Carregando, EtiquetaPapel.
+- `src/lib/marca.js`: `urlMarca(caminho)` para os arquivos de `public/marca/`.
+- `src/componentes/`: Layout (cabeçalho, menu e rodapé), Logo, Modal, Confirmar, Aviso, Carregando, EtiquetaPapel.
 - `src/telas/`: Login, EmBreve e `admin/` (Administracao, FormMembro).
-- `src/styles.css`: todo o visual, com as cores e medidas da identidade em variáveis CSS.
+- `src/styles.css`: todo o visual. As 7 cores, as transparências permitidas, os gradientes e as cores de situação ficam em variáveis no `:root`; usar sempre as variáveis.
+- `Logo` recebe `versao` (`horizontal-branco`, `vertical-branco`, `horizontal-azul`, `vertical-azul`, `icone-branco`, `icone-azul`) e, se quiser, `versaoCelular` (o cabeçalho usa o ícone no celular).
+
+Arquivos da marca em `public/marca/`:
+
+- Vieram do kit da skill `eletrica-bahiana`. Lá, os dois logos azuis estão com os nomes trocados (o "Horizontal_Azul" é o empilhado); aqui cada nome corresponde ao desenho.
+- Logos e mascotes foram só recortados na margem transparente (e os mascotes reduzidos para 720px de altura, na mesma proporção). Nenhuma cor ou forma foi alterada.
+- `patterns/Pattern_EB_faixa.png` é a faixa de circuito recortada do `Pattern_EB_1080x1920.png`, usada nas laterais do login.
+- O botão de login não usa o "G" colorido do Google (cores fora da paleta); usa o ícone `LogIn` da Lucide.
 
 Decisões já tomadas:
 
@@ -260,4 +293,5 @@ Decisões já tomadas:
 
 - Fase 1 pronta: projeto React + Vite + Firebase, login com Google, pedido de acesso, cabeçalho e menu por papel, tela de Administração. As outras telas aparecem como "em breve".
 - Fase 1 enviada para a `main` no GitHub. Commits deste repositório assinados como "Ivie" <ivie.cidreira@eletricabahiana.com.br> (configurado só neste repositório).
-- Falta `public/logo.svg`.
+- Visual refeito com a identidade #EnergiaBahiana 2026 (login, cabeçalho, menu, Administração, telas em breve).
+- Faltam os arquivos da Klavika em `public/fontes/`. Enquanto não existirem, os títulos usam Lato Black.

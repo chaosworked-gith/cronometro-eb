@@ -47,7 +47,7 @@ export default function FormMembro({ modo, inicial = {}, proprio = false, emails
         {modo === 'editar' ? (
           <div className="modal-pessoa">
             <strong>{inicial.nome}</strong>
-            <span className="mono">{inicial.email}</span>
+            <span className="email">{inicial.email}</span>
           </div>
         ) : (
           <label className="campo">
@@ -71,7 +71,7 @@ export default function FormMembro({ modo, inicial = {}, proprio = false, emails
         {modo === 'aprovar' && (
           <div className="campo">
             <span>E-mail</span>
-            <span className="mono campo-fixo">{inicial.email}</span>
+            <span className="email campo-fixo">{inicial.email}</span>
           </div>
         )}
 

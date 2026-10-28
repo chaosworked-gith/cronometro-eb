@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Hourglass, UserPlus } from 'lucide-react';
+import { Hourglass, LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '../auth/AuthProvider';
 import Aviso from '../componentes/Aviso';
 import Carregando from '../componentes/Carregando';
-import IconeGoogle from '../componentes/IconeGoogle';
 import Logo from '../componentes/Logo';
+import { urlMarca } from '../lib/marca';
 import { DOMINIO } from '../permissoes';
 
 export default function Login() {
@@ -49,17 +49,15 @@ export default function Login() {
         {aviso && <Aviso tipo="erro">{aviso}</Aviso>}
         <button
           type="button"
-          className="btn btn-destaque btn-grande btn-bloco"
+          className="btn btn-primario btn-grande btn-bloco"
           onClick={clicarEntrar}
           disabled={entrando}
         >
-          <span className="google-circulo">
-            <IconeGoogle />
-          </span>
+          <LogIn size={20} />
           {entrando ? 'Entrando...' : 'Entrar com Google'}
         </button>
         <p className="login-nota">
-          Entre com o seu e-mail <span className="mono">@{DOMINIO}</span>
+          Entre com o seu e-mail <strong>@{DOMINIO}</strong>
         </p>
       </>
     );
@@ -68,13 +66,13 @@ export default function Login() {
     corpo = (
       <>
         <p className="login-texto">
-          {primeiroNome ? `Olá, ${primeiroNome}! ` : ''}O e-mail{' '}
-          <span className="mono">{usuario.email}</span> ainda não tem acesso ao Cronômetro.
+          {primeiroNome ? `Olá, ${primeiroNome}! ` : ''}O e-mail <strong className="email">{usuario.email}</strong>{' '}
+          ainda não tem acesso ao Cronômetro.
         </p>
         {erroPedido && <Aviso tipo="erro">{erroPedido}</Aviso>}
         <button
           type="button"
-          className="btn btn-destaque btn-grande btn-bloco"
+          className="btn btn-primario btn-grande btn-bloco"
           onClick={clicarSolicitar}
           disabled={enviando}
         >
@@ -120,15 +118,20 @@ export default function Login() {
   return (
     <div className="tela-login">
       <div className="login-coluna">
-        <Logo className="login-logo" />
+        <Logo versao="vertical-branco" className="login-logo" />
         <div className="janela login-cartao">
-          <span className="etiqueta etiqueta-laranja">Marketing EB</span>
+          <span className="etiqueta etiqueta-suave">Marketing EB</span>
           <h1 className="login-titulo">Cronômetro de Atividades</h1>
           <p className="login-sub">Registre o tempo das suas demandas e acompanhe o ritmo da equipe.</p>
           <div className="login-corpo">{corpo}</div>
         </div>
-        <p className="login-slogan">Mais forte por você!</p>
       </div>
+
+      <footer className="login-rodape">
+        <img src={urlMarca('mascotes/Mascote_Ebinho.png')} alt="" className="mascote mascote-esquerda" />
+        <span className="hashtag">#EnergiaBahiana</span>
+        <img src={urlMarca('mascotes/Mascote_Ebinha.png')} alt="" className="mascote mascote-direita" />
+      </footer>
     </div>
   );
 }

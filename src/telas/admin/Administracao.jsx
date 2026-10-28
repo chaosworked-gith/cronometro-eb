@@ -118,7 +118,7 @@ export default function Administracao() {
           <h1 className="titulo-pagina">Administração</h1>
           <p className="subtitulo">Cadastre pessoas, defina papéis e libere pedidos de acesso.</p>
         </div>
-        <button type="button" className="btn btn-destaque" onClick={() => setJanela({ tipo: 'adicionar' })}>
+        <button type="button" className="btn btn-primario" onClick={() => setJanela({ tipo: 'adicionar' })}>
           <UserPlus size={18} />
           Adicionar membro
         </button>
@@ -130,7 +130,7 @@ export default function Administracao() {
         </Aviso>
       )}
 
-      <div className={`cartao secao${pedidos.length > 0 ? ' secao-alerta' : ''}`}>
+      <div className={`cartao secao${pedidos.length > 0 ? ' secao-destaque' : ''}`}>
         <div className="secao-topo">
           <h2>
             <Inbox size={20} aria-hidden="true" />
@@ -146,7 +146,7 @@ export default function Administracao() {
               <li key={p.email} className="pedido">
                 <div className="pedido-info">
                   <strong>{p.nome}</strong>
-                  <span className="mono">{p.email}</span>
+                  <span className="email">{p.email}</span>
                   {p.criadoEm && <span className="texto-secundario">Pedido em {formatarDataHora(p.criadoEm)}</span>}
                 </div>
                 <div className="pedido-acoes">
@@ -183,62 +183,64 @@ export default function Administracao() {
         ) : membros === null ? (
           <Carregando />
         ) : (
-          <table className="tabela tabela-responsiva">
-            <thead>
-              <tr>
-                <th>Nome e e-mail</th>
-                <th>Cargo</th>
-                <th>Papel</th>
-                <th>Situação</th>
-                <th>
-                  <span className="sr-only">Ações</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {membros.map((m) => {
-                const proprio = m.email === perfil.email;
-                return (
-                  <tr key={m.email} className={m.ativo ? '' : 'linha-inativa'}>
-                    <td className="celula-pessoa">
-                      <div>
-                        <strong>{m.nome}</strong>
-                        {proprio && <span className="etiqueta etiqueta-suave">Você</span>}
-                      </div>
-                      <span className="pessoa-email">{m.email}</span>
-                    </td>
-                    <td data-rotulo="Cargo">{m.cargo || <span className="texto-secundario">Sem cargo</span>}</td>
-                    <td data-rotulo="Papel">
-                      <EtiquetaPapel papel={m.papel} />
-                    </td>
-                    <td data-rotulo="Situação">
-                      <span className={`pilula ${m.ativo ? 'pilula-ativo' : 'pilula-inativo'}`}>
-                        {m.ativo ? 'Ativo' : 'Inativo'}
-                      </span>
-                    </td>
-                    <td className="celula-acoes">
-                      <button
-                        type="button"
-                        className="btn btn-secundario btn-pequeno"
-                        onClick={() => setJanela({ tipo: 'editar', membro: m })}
-                      >
-                        <Pencil size={16} />
-                        Editar
-                      </button>
-                      <button
-                        type="button"
-                        className={`btn btn-pequeno ${m.ativo ? 'btn-perigo' : 'btn-secundario'}`}
-                        onClick={() => clicarSituacao(m)}
-                      >
-                        <Power size={16} />
-                        {m.ativo ? 'Desativar' : 'Ativar'}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="tabela-moldura">
+            <table className="tabela tabela-responsiva">
+              <thead>
+                <tr>
+                  <th>Nome e e-mail</th>
+                  <th>Cargo</th>
+                  <th>Papel</th>
+                  <th>Situação</th>
+                  <th>
+                    <span className="sr-only">Ações</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {membros.map((m) => {
+                  const proprio = m.email === perfil.email;
+                  return (
+                    <tr key={m.email} className={m.ativo ? '' : 'linha-inativa'}>
+                      <td className="celula-pessoa">
+                        <div>
+                          <strong>{m.nome}</strong>
+                          {proprio && <span className="etiqueta etiqueta-suave">Você</span>}
+                        </div>
+                        <span className="pessoa-email">{m.email}</span>
+                      </td>
+                      <td data-rotulo="Cargo">{m.cargo || <span className="texto-secundario">Sem cargo</span>}</td>
+                      <td data-rotulo="Papel">
+                        <EtiquetaPapel papel={m.papel} />
+                      </td>
+                      <td data-rotulo="Situação">
+                        <span className={`pilula ${m.ativo ? 'pilula-ativo' : 'pilula-inativo'}`}>
+                          {m.ativo ? 'Ativo' : 'Inativo'}
+                        </span>
+                      </td>
+                      <td className="celula-acoes">
+                        <button
+                          type="button"
+                          className="btn btn-secundario btn-pequeno"
+                          onClick={() => setJanela({ tipo: 'editar', membro: m })}
+                        >
+                          <Pencil size={16} />
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          className={`btn btn-pequeno ${m.ativo ? 'btn-perigo' : 'btn-secundario'}`}
+                          onClick={() => clicarSituacao(m)}
+                        >
+                          <Power size={16} />
+                          {m.ativo ? 'Desativar' : 'Ativar'}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
@@ -272,7 +274,7 @@ export default function Administracao() {
         >
           <p>
             Recusar o pedido de <strong>{janela.pedido.nome}</strong> (
-            <span className="mono">{janela.pedido.email}</span>)? O pedido sai da lista e a pessoa pode pedir de novo
+            <span className="email">{janela.pedido.email}</span>)? O pedido sai da lista e a pessoa pode pedir de novo
             depois.
           </p>
         </Confirmar>

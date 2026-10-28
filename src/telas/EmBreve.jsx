@@ -7,7 +7,7 @@ export default function EmBreve({ tela }) {
         <div className="em-breve-icone">
           <Icone size={32} aria-hidden="true" />
         </div>
-        <span className="etiqueta etiqueta-laranja">Em breve</span>
+        <span className="etiqueta etiqueta-destaque">Em breve</span>
         <p>{tela.descricao}</p>
         <p className="texto-secundario">Esta tela chega nas próximas fases do projeto.</p>
       </div>

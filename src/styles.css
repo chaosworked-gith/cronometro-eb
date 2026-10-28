@@ -1,30 +1,67 @@
-/* Identidade visual Endomarketing EB 2026. Grade de 8px. */
-:root {
-  --navy: #0b2156;
-  --amarelo: #f5c200;
-  --laranja: #e8600a;
-  --branco: #ffffff;
-  --fundo: #f4f6fa;
-  --cinza: #8694ab;
-  --texto: #0a1929;
+/* Identidade visual Endomarketing EB #EnergiaBahiana 2026.
+   Só as 7 cores da paleta. Tons claros apenas como transparência delas. Grade de 8px. */
 
-  --borda: #e1e6ef;
-  --navy-suave: #e7ebf4;
-  --laranja-suave: #fdeee4;
-  --amarelo-suave: #fff6d6;
+/* Klavika (títulos de destaque e números do cronômetro). Sem o arquivo, vale a Lato Black. */
+@font-face {
+  font-family: 'Klavika';
+  src: url('/fontes/klavika-bold.otf') format('opentype');
+  font-weight: 700 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Klavika';
+  src: url('/fontes/klavika-medium.otf') format('opentype');
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Klavika';
+  src: url('/fontes/klavika-light.otf') format('opentype');
+  font-weight: 300;
+  font-display: swap;
+}
+
+:root {
+  --azul-marinho: #001780;
+  --azul-brilhante: #0037ff;
+  --azul-medio: #4069ff;
+  --vermelho: #d4121a;
+  --vermelho-escuro: #a92a2e;
+  --branco: #ffffff;
+  --preto: #000000;
+
+  /* Transparências da paleta */
+  --texto-secundario: rgba(0, 23, 128, 0.72);
+  --borda: rgba(0, 23, 128, 0.16);
+  --linha-alternada: rgba(64, 105, 255, 0.1);
+  --fundo-suave: rgba(64, 105, 255, 0.08);
+  --vermelho-suave: rgba(212, 18, 26, 0.08);
+  --preto-suave: rgba(0, 0, 0, 0.06);
+
+  --gradiente-principal: linear-gradient(135deg, #001780 0%, #0037ff 60%, #4069ff 100%);
+  --gradiente-vermelho: linear-gradient(135deg, #a92a2e 0%, #d4121a 100%);
+  --gradiente-premium: linear-gradient(135deg, #000000 0%, #001780 100%);
+
+  /* Situação das demandas */
+  --situacao-andamento: var(--azul-brilhante);
+  --situacao-pausada: var(--azul-medio);
+  --situacao-concluida: var(--azul-marinho);
+  --situacao-alerta: var(--vermelho);
 
   --raio-etiqueta: 4px;
   --raio: 8px;
   --raio-janela: 16px;
   --raio-pilula: 100px;
 
-  --sombra-cartao: 0 2px 8px rgba(11, 33, 86, 0.1);
-  --sombra-janela: 0 8px 24px rgba(11, 33, 86, 0.16);
+  --sombra-cartao: 0 2px 8px rgba(0, 23, 128, 0.1);
+  --sombra-janela: 0 8px 24px rgba(0, 23, 128, 0.16);
+  --brilho-circuito: 0 0 8px rgba(0, 55, 255, 0.6);
   --transicao: 200ms ease-out;
 
-  --fonte-titulo: 'Barlow Condensed', 'Arial Narrow', sans-serif;
-  --fonte: 'Barlow', system-ui, sans-serif;
-  --fonte-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --fonte: 'Lato', system-ui, sans-serif;
+  --fonte-destaque: 'Klavika', 'Lato', system-ui, sans-serif;
 }
 
 *,
@@ -36,8 +73,8 @@
 html,
 body {
   margin: 0;
-  background: var(--fundo);
-  color: var(--texto);
+  background: var(--branco);
+  color: var(--preto);
   font-family: var(--fonte);
   font-size: 16px;
   line-height: 1.5;
@@ -59,17 +96,16 @@ select {
 }
 
 :focus-visible {
-  outline: 2px solid var(--amarelo);
+  outline: 2px solid var(--azul-medio);
   outline-offset: 2px;
 }
 
-.mono {
-  font-family: var(--fonte-mono);
-  font-size: 0.875em;
+.email {
+  overflow-wrap: anywhere;
 }
 
 .texto-secundario {
-  color: var(--cinza);
+  color: var(--texto-secundario);
   font-size: 14px;
 }
 
@@ -92,7 +128,7 @@ select {
   padding: 0 16px;
   border: 1px solid transparent;
   border-radius: var(--raio);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 15px;
   white-space: nowrap;
   cursor: pointer;
@@ -110,44 +146,44 @@ select {
 }
 
 .btn-primario {
-  background: var(--navy);
+  background: var(--azul-brilhante);
   color: var(--branco);
-}
-
-.btn-destaque {
-  background: var(--amarelo);
-  color: var(--navy);
 }
 
 .btn-secundario {
   background: var(--branco);
-  color: var(--navy);
+  color: var(--azul-marinho);
   border-color: var(--borda);
 }
 
 .btn-perigo {
   background: var(--branco);
-  color: var(--laranja);
-  border-color: #f4c6a8;
+  color: var(--vermelho);
+  border-color: rgba(212, 18, 26, 0.4);
 }
 
 .btn-perigo-cheio {
-  background: var(--laranja);
+  background: var(--vermelho);
   color: var(--branco);
+}
+
+/* O vermelho escurece com a cor da paleta, não com filtro */
+.btn-perigo-cheio:hover:not(:disabled) {
+  filter: none;
+  background: var(--vermelho-escuro);
 }
 
 .btn-fantasma {
   background: transparent;
   color: var(--branco);
-  border-color: rgba(255, 255, 255, 0.32);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .btn-link {
   background: none;
   border: 0;
   padding: 8px 0;
-  color: var(--cinza);
-  font-weight: 500;
+  color: var(--texto-secundario);
   font-size: 14px;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -155,7 +191,7 @@ select {
 }
 
 .btn-link:hover {
-  color: var(--navy);
+  color: var(--azul-marinho);
 }
 
 .btn-grande {
@@ -188,7 +224,7 @@ select {
 }
 
 .btn-icone:hover {
-  background: rgba(11, 33, 86, 0.08);
+  background: var(--fundo-suave);
 }
 
 /* ---------- Etiquetas e pílulas ---------- */
@@ -205,35 +241,38 @@ select {
   white-space: nowrap;
 }
 
-.etiqueta-laranja {
-  background: var(--laranja);
+.etiqueta-destaque {
+  background: var(--azul-brilhante);
   color: var(--branco);
 }
 
 .etiqueta-suave {
+  background: rgba(0, 55, 255, 0.1);
+  color: var(--azul-brilhante);
+}
+
+.celula-pessoa .etiqueta-suave {
   margin-left: 8px;
-  background: var(--amarelo-suave);
-  color: var(--navy);
 }
 
 .papel-admin {
-  background: var(--navy);
+  background: var(--azul-marinho);
   color: var(--branco);
 }
 
 .papel-equipe {
-  background: var(--amarelo);
-  color: var(--navy);
+  background: var(--azul-brilhante);
+  color: var(--branco);
 }
 
 .papel-gestor {
-  background: var(--navy-suave);
-  color: var(--navy);
+  background: var(--azul-medio);
+  color: var(--branco);
 }
 
 .papel-diretoria {
-  background: var(--laranja-suave);
-  color: #a3420a;
+  background: var(--gradiente-premium);
+  color: var(--branco);
 }
 
 .pilula {
@@ -244,7 +283,7 @@ select {
   padding: 0 12px;
   border-radius: var(--raio-pilula);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .pilula::before {
@@ -256,13 +295,13 @@ select {
 }
 
 .pilula-ativo {
-  background: var(--navy-suave);
-  color: var(--navy);
+  background: rgba(0, 55, 255, 0.1);
+  color: var(--azul-brilhante);
 }
 
 .pilula-inativo {
-  background: #eef0f4;
-  color: var(--cinza);
+  background: var(--preto-suave);
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .badge {
@@ -273,10 +312,10 @@ select {
   height: 20px;
   padding: 0 6px;
   border-radius: var(--raio-pilula);
-  background: var(--laranja);
+  background: var(--vermelho);
   color: var(--branco);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 900;
   line-height: 1;
 }
 
@@ -308,20 +347,21 @@ select {
 }
 
 .aviso-erro {
-  background: var(--laranja-suave);
-  border-color: var(--laranja);
-  color: #8a3407;
+  background: var(--vermelho-suave);
+  border-color: var(--vermelho);
+  color: var(--vermelho-escuro);
 }
 
-.aviso-info,
-.aviso-sucesso {
-  background: var(--navy-suave);
-  border-color: var(--navy);
-  color: var(--navy);
+.aviso-info {
+  background: var(--linha-alternada);
+  border-color: var(--azul-brilhante);
+  color: var(--azul-marinho);
 }
 
 .aviso-sucesso {
-  border-color: var(--amarelo);
+  background: var(--linha-alternada);
+  border-color: var(--azul-marinho);
+  color: var(--azul-marinho);
 }
 
 /* ---------- Carregando ---------- */
@@ -331,10 +371,11 @@ select {
   justify-content: center;
   gap: 8px;
   padding: 24px;
-  color: var(--cinza);
+  color: var(--texto-secundario);
 }
 
 .girando {
+  color: var(--azul-brilhante);
   animation: girar 1s linear infinite;
 }
 
@@ -350,60 +391,51 @@ select {
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 32px 16px;
-  background: var(--navy);
+  padding: 48px 16px 0;
+  background: var(--gradiente-principal);
   overflow: hidden;
 }
 
-/* Faixas de energia no canto */
+/* Pattern_EB (circuito) nas laterais, a 20% */
 .tela-login::before,
 .tela-login::after {
   content: '';
   position: absolute;
-  right: -160px;
-  width: 640px;
-  height: 64px;
-  transform: rotate(-32deg);
+  top: 0;
+  bottom: 0;
+  width: 128px;
+  background: url('/marca/patterns/Pattern_EB_faixa.png') left top / 100% auto repeat-y;
+  opacity: 0.2;
   pointer-events: none;
 }
 
 .tela-login::before {
-  bottom: 120px;
-  background: var(--amarelo);
+  left: 0;
+  transform: scaleX(-1);
 }
 
 .tela-login::after {
-  bottom: 48px;
-  height: 24px;
-  background: var(--laranja);
+  right: 0;
 }
 
 .login-coluna {
   position: relative;
   z-index: 1;
+  flex: 1;
   width: 100%;
   max-width: 440px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  justify-content: center;
+  gap: 32px;
 }
 
 .login-logo {
-  max-height: 56px;
-  max-width: 240px;
-}
-
-.logo-texto {
-  font-family: var(--fonte-titulo);
-  font-weight: 800;
-  font-size: 28px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--branco);
-  white-space: nowrap;
+  width: 224px;
+  height: auto;
 }
 
 .janela {
@@ -423,15 +455,15 @@ select {
 
 .login-titulo {
   margin-top: 8px;
-  font-family: var(--fonte-titulo);
-  font-weight: 800;
-  font-size: 40px;
-  line-height: 1.05;
-  color: var(--navy);
+  font-family: var(--fonte-destaque);
+  font-weight: 900;
+  font-size: 34px;
+  line-height: 1.1;
+  color: var(--azul-marinho);
 }
 
 .login-sub {
-  color: var(--cinza);
+  color: var(--texto-secundario);
 }
 
 .login-corpo {
@@ -448,31 +480,43 @@ select {
 }
 
 .login-nota {
-  color: var(--cinza);
+  color: var(--texto-secundario);
   font-size: 14px;
   text-align: center;
 }
 
-.google-circulo {
-  display: inline-flex;
-  align-items: center;
+/* Rodapé do login: mascotes ancorados na borda inferior e a hashtag */
+.login-rodape {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--branco);
+  padding: 48px 16px 24px;
 }
 
-.login-slogan {
-  /* Fundo navy para o slogan continuar legível se cruzar a faixa amarela */
-  padding: 0 16px;
-  border-radius: var(--raio-pilula);
-  background: var(--navy);
-  font-family: var(--fonte-titulo);
-  font-weight: 700;
-  font-size: 22px;
-  letter-spacing: 0.02em;
-  color: var(--amarelo);
+.mascote {
+  position: absolute;
+  bottom: 0;
+  height: clamp(240px, 46vh, 420px);
+  width: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.mascote-esquerda {
+  right: calc(50% + 248px);
+}
+
+.mascote-direita {
+  left: calc(50% + 248px);
+}
+
+.hashtag {
+  font-family: var(--fonte);
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--branco);
 }
 
 /* ---------- Estrutura do app ---------- */
@@ -489,7 +533,7 @@ select {
   gap: 16px;
   min-height: 64px;
   padding: 8px 24px;
-  background: var(--navy);
+  background: var(--azul-marinho);
   color: var(--branco);
 }
 
@@ -501,21 +545,16 @@ select {
 }
 
 .cabecalho-logo {
-  max-height: 36px;
-  max-width: 160px;
-}
-
-.cabecalho .logo-texto {
-  font-size: 20px;
+  display: block;
+  height: 32px;
+  width: auto;
 }
 
 .cabecalho-titulo {
   padding-left: 16px;
-  border-left: 1px solid rgba(255, 255, 255, 0.24);
-  font-family: var(--fonte-titulo);
+  border-left: 1px solid rgba(255, 255, 255, 0.32);
   font-weight: 700;
-  font-size: 20px;
-  letter-spacing: 0.02em;
+  font-size: 17px;
   white-space: nowrap;
 }
 
@@ -535,12 +574,12 @@ select {
 }
 
 .usuario-info strong {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .usuario-info span {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .usuario-info strong,
@@ -566,26 +605,38 @@ select {
 }
 
 .menu-item {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 16px 12px 13px;
-  border-bottom: 3px solid transparent;
-  color: var(--cinza);
-  font-weight: 600;
+  padding: 16px 12px;
+  color: var(--texto-secundario);
+  font-weight: 700;
   font-size: 15px;
   text-decoration: none;
   white-space: nowrap;
-  transition: color var(--transicao), border-color var(--transicao);
+  transition: color var(--transicao);
 }
 
 .menu-item:hover {
-  color: var(--navy);
+  color: var(--azul-marinho);
 }
 
 .menu-item.ativo {
-  color: var(--navy);
-  border-bottom-color: var(--amarelo);
+  color: var(--azul-brilhante);
+}
+
+/* Linha de circuito com brilho sutil na aba ativa */
+.menu-item.ativo::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--azul-brilhante);
+  box-shadow: var(--brilho-circuito);
 }
 
 .rotulo-curto {
@@ -598,6 +649,17 @@ select {
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px 24px 48px;
+}
+
+.rodape {
+  padding: 24px;
+  border-top: 1px solid var(--borda);
+  text-align: center;
+}
+
+.rodape .hashtag {
+  font-size: 16px;
+  color: var(--azul-marinho);
 }
 
 /* ---------- Páginas ---------- */
@@ -616,16 +678,16 @@ select {
 }
 
 .titulo-pagina {
-  font-family: var(--fonte-titulo);
-  font-weight: 800;
+  font-family: var(--fonte-destaque);
+  font-weight: 900;
   font-size: 36px;
   line-height: 1.1;
-  color: var(--navy);
+  color: var(--azul-marinho);
 }
 
 .subtitulo {
   margin-top: 4px;
-  color: var(--cinza);
+  color: var(--texto-secundario);
 }
 
 .cartao {
@@ -650,8 +712,8 @@ select {
   gap: 16px;
 }
 
-.secao-alerta {
-  border-top: 4px solid var(--laranja);
+.secao-destaque {
+  border-top: 4px solid var(--azul-brilhante);
 }
 
 .secao-topo {
@@ -665,10 +727,9 @@ select {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--fonte-titulo);
-  font-weight: 700;
-  font-size: 24px;
-  color: var(--navy);
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--azul-marinho);
 }
 
 .secao-topo h2 + .badge {
@@ -676,7 +737,7 @@ select {
 }
 
 .vazio {
-  color: var(--cinza);
+  color: var(--texto-secundario);
 }
 
 /* Em breve */
@@ -696,8 +757,9 @@ select {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: var(--amarelo);
-  color: var(--navy);
+  background: var(--gradiente-principal);
+  color: var(--branco);
+  box-shadow: var(--brilho-circuito);
 }
 
 .em-breve p {
@@ -739,27 +801,28 @@ select {
   min-width: 0;
 }
 
-.pedido-info .mono {
-  overflow-wrap: anywhere;
-}
-
 .pedido-acoes {
   display: flex;
   gap: 8px;
 }
 
 /* ---------- Tabela ---------- */
+.tabela-moldura {
+  border-radius: var(--raio);
+  overflow: hidden;
+}
+
 .tabela {
   width: 100%;
   border-collapse: collapse;
 }
 
 .tabela th {
-  padding: 8px 16px;
-  border-bottom: 1px solid var(--borda);
-  color: var(--cinza);
+  padding: 12px 16px;
+  background: var(--azul-marinho);
+  color: var(--branco);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-align: left;
   text-transform: uppercase;
@@ -767,33 +830,21 @@ select {
 
 .tabela td {
   padding: 12px 16px;
-  border-bottom: 1px solid var(--borda);
   vertical-align: middle;
 }
 
-.tabela th:first-child,
-.tabela td:first-child {
-  padding-left: 0;
-}
-
-.tabela th:last-child,
-.tabela td:last-child {
-  padding-right: 0;
-}
-
-.tabela tbody tr:last-child td {
-  border-bottom: 0;
+.tabela tbody tr:nth-child(even) td {
+  background: var(--linha-alternada);
 }
 
 .linha-inativa td {
-  color: var(--cinza);
+  color: rgba(0, 0, 0, 0.55);
 }
 
 .pessoa-email {
   display: block;
-  color: var(--cinza);
-  font-family: var(--fonte-mono);
-  font-size: 13px;
+  color: var(--texto-secundario);
+  font-size: 14px;
   white-space: nowrap;
 }
 
@@ -815,7 +866,7 @@ select {
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgba(10, 25, 41, 0.48);
+  background: rgba(0, 23, 128, 0.5);
   animation: aparecer var(--transicao);
 }
 
@@ -841,13 +892,12 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  color: var(--azul-marinho);
 }
 
 .modal-topo h2 {
-  font-family: var(--fonte-titulo);
-  font-weight: 700;
-  font-size: 26px;
-  color: var(--navy);
+  font-weight: 900;
+  font-size: 24px;
 }
 
 .modal-corpo {
@@ -861,7 +911,7 @@ select {
   flex-direction: column;
   padding: 12px 16px;
   border-radius: var(--raio);
-  background: var(--fundo);
+  background: var(--fundo-suave);
 }
 
 .modal-acoes {
@@ -886,7 +936,8 @@ select {
 
 .campo > span:first-child {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--azul-marinho);
 }
 
 .campo input,
@@ -899,16 +950,20 @@ select {
   transition: border-color var(--transicao), box-shadow var(--transicao);
 }
 
+.campo input::placeholder {
+  color: rgba(0, 0, 0, 0.45);
+}
+
 .campo input:focus,
 .campo select:focus {
   outline: none;
-  border-color: var(--navy);
-  box-shadow: 0 0 0 3px rgba(245, 194, 0, 0.4);
+  border-color: var(--azul-brilhante);
+  box-shadow: 0 0 0 3px rgba(0, 55, 255, 0.2);
 }
 
 .campo select:disabled {
-  background: var(--fundo);
-  color: var(--cinza);
+  background: var(--fundo-suave);
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .campo-fixo {
@@ -916,7 +971,7 @@ select {
 }
 
 .ajuda {
-  color: var(--cinza);
+  color: var(--texto-secundario);
   font-size: 13px;
 }
 
@@ -941,7 +996,7 @@ select {
 
   .usuario-info strong,
   .usuario-info span {
-    max-width: 150px;
+    max-width: 180px;
   }
 
   /* Menu vira barra de abas: todas visíveis, ícone em cima e nome curto embaixo */
@@ -951,7 +1006,6 @@ select {
   }
 
   .menu-item {
-    position: relative;
     flex: 1 1 0;
     min-width: 0;
     flex-direction: column;
@@ -989,32 +1043,57 @@ select {
     padding: 16px;
   }
 
-  .login-cartao {
-    padding: 24px;
-  }
-
   .tela-login {
-    padding-bottom: 128px;
+    padding-top: 32px;
   }
 
   .tela-login::before,
   .tela-login::after {
-    right: -96px;
-    width: 320px;
+    width: 64px;
   }
 
-  .tela-login::before {
-    bottom: 56px;
-    height: 32px;
+  .login-coluna {
+    gap: 24px;
   }
 
-  .tela-login::after {
-    bottom: 16px;
-    height: 12px;
+  .login-logo {
+    width: 184px;
+  }
+
+  .login-cartao {
+    padding: 24px;
   }
 
   .login-titulo {
-    font-size: 34px;
+    font-size: 30px;
+  }
+
+  /* Mascotes nos cantos de baixo, cortados na altura das pernas */
+  .login-rodape {
+    height: 168px;
+    margin-top: 16px;
+    align-items: flex-end;
+    overflow: hidden;
+    padding: 0 16px 24px;
+  }
+
+  .mascote {
+    height: 240px;
+    bottom: -80px;
+  }
+
+  .mascote-esquerda {
+    right: auto;
+    left: 8px;
+  }
+
+  .mascote-direita {
+    left: auto;
+    right: 8px;
+  }
+
+  .hashtag {
+    font-size: 18px;
   }
 
   .pedido-acoes {
@@ -1040,37 +1119,31 @@ select {
   }
 
   .tabela-responsiva tr {
-    padding: 16px 0;
-    border-bottom: 1px solid var(--borda);
+    padding: 16px;
   }
 
-  .tabela-responsiva tbody tr:first-child {
-    padding-top: 0;
+  .tabela-responsiva tbody tr:nth-child(even) {
+    background: var(--linha-alternada);
   }
 
-  .tabela-responsiva tbody tr:last-child {
-    border-bottom: 0;
-    padding-bottom: 0;
+  .tabela-responsiva tbody tr:nth-child(even) td {
+    background: none;
   }
 
-  .tabela-responsiva td,
-  .tabela-responsiva td:first-child,
-  .tabela-responsiva td:last-child {
+  .tabela-responsiva td {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
     padding: 4px 0;
-    border: 0;
     text-align: right;
   }
 
   .tabela-responsiva td[data-rotulo]::before {
     content: attr(data-rotulo);
-    color: var(--cinza);
-    font-family: var(--fonte);
+    color: var(--texto-secundario);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     text-align: left;
   }
 
@@ -1088,7 +1161,7 @@ select {
 
   .tabela-responsiva .pessoa-email {
     white-space: normal;
-    word-break: break-all;
+    overflow-wrap: anywhere;
   }
 
   .tabela-responsiva td.celula-acoes {

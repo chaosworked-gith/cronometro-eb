@@ -13,7 +13,7 @@ export default function Layout() {
     <div className="app">
       <header className="cabecalho">
         <div className="cabecalho-marca">
-          <Logo className="cabecalho-logo" />
+          <Logo versao="horizontal-branco" versaoCelular="icone-branco" className="cabecalho-logo" />
           <span className="cabecalho-titulo">Cronômetro de Atividades</span>
         </div>
         <div className="cabecalho-usuario">
@@ -49,6 +49,10 @@ export default function Layout() {
       <main className="conteudo">
         <Outlet context={{ pedidos }} />
       </main>
+
+      <footer className="rodape">
+        <span className="hashtag">#EnergiaBahiana</span>
+      </footer>
     </div>
   );
 }
