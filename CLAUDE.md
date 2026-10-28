@@ -259,4 +259,5 @@ Decisões já tomadas:
 ## Estado atual
 
 - Fase 1 pronta: projeto React + Vite + Firebase, login com Google, pedido de acesso, cabeçalho e menu por papel, tela de Administração. As outras telas aparecem como "em breve".
-- Ainda sem commits. Falta `public/logo.svg`.
+- Fase 1 enviada para a `main` no GitHub. Commits deste repositório assinados como "Ivie" <ivie.cidreira@eletricabahiana.com.br> (configurado só neste repositório).
+- Falta `public/logo.svg`.
