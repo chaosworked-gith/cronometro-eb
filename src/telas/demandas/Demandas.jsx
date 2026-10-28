@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Combine, ListChecks, Pencil, Search, Trash2, TriangleAlert } from 'lucide-react';
+import { Combine, Download, ListChecks, Pencil, Search, Trash2, TriangleAlert } from 'lucide-react';
 import { useAuth } from '../../auth/AuthProvider';
 import Aviso from '../../componentes/Aviso';
 import Carregando from '../../componentes/Carregando';
@@ -13,6 +13,7 @@ import useConsulta from '../../hooks/useConsulta';
 import { COLUNAS_DEMANDA, camposFaltando } from '../../lib/colunas';
 import { diaISO, formatarAjuste, formatarData, rotuloMes } from '../../lib/datas';
 import { mensagemDeErro } from '../../lib/erros';
+import { agruparPorPessoa, exportarExcel } from '../../lib/excel';
 import { OPCOES_PUBLICO, OPCOES_SOLICITANTE } from '../../lib/regras';
 import { formatarHMS } from '../../lib/tempo';
 import { normalizar, ordenarPorTexto } from '../../lib/texto';
@@ -53,6 +54,7 @@ export default function Demandas() {
   const [soFaltando, setSoFaltando] = useState(false);
   const [selecionadas, setSelecionadas] = useState([]);
   const [janela, setJanela] = useState(null);
+  const [exportando, setExportando] = useState(false);
   const [aviso, setAviso] = useAviso();
   const filtrar = (campo) => (valor) => setFiltros((f) => ({ ...f, [campo]: valor }));
 
@@ -95,6 +97,23 @@ export default function Demandas() {
     setSelecionadas((atual) => (atual.includes(id) ? atual.filter((x) => x !== id) : [...atual.slice(-1), id]));
   }
 
+  // Exporta o mês inteiro (todas as pessoas), no mesmo formato da Semana
+  async function exportarMes() {
+    setExportando(true);
+    try {
+      await exportarExcel({
+        nomeArquivo: `Cronometro_Mes_${mes.slice(5, 7)}-${mes.slice(0, 4)}.xlsx`,
+        periodo: rotuloMes(mes),
+        pessoas: agruparPorPessoa(demandas, membros.itens),
+        equipe: demandas,
+      });
+    } catch {
+      setAviso({ tipo: 'erro', texto: 'Não foi possível gerar o Excel. Tente de novo.' });
+    } finally {
+      setExportando(false);
+    }
+  }
+
   function mudarMes(novo) {
     setMes(novo);
     setSelecionadas([]);
@@ -107,7 +126,13 @@ export default function Demandas() {
           <h1 className="titulo-pagina">Demandas</h1>
           <p className="subtitulo">Todas as demandas do mês, nas mesmas colunas da planilha.</p>
         </div>
-        <SeletorMes mes={mes} aoMudar={mudarMes} />
+        <div className="pagina-acoes">
+          <SeletorMes mes={mes} aoMudar={mudarMes} />
+          <button type="button" className="btn btn-primario" onClick={exportarMes} disabled={exportando || !demandas.length}>
+            <Download size={18} />
+            {exportando ? 'Gerando...' : 'Exportar mês'}
+          </button>
+        </div>
       </div>
 
       {aviso && (

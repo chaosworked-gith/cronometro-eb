@@ -285,7 +285,8 @@ A importação usa a mesma planilha. Conferir o formato das datas e das colunas 
 - `src/lib/marca.js`: `urlMarca(caminho)` para os arquivos de `public/marca/`.
 - `src/hooks/`: `useColecao` (coleção em tempo real), `useConsulta` (consulta só com igualdades), `useDocumento` (um documento), `useAgora` (relógio de 1 segundo), `useAviso` (aviso que some sozinho; erros ficam), `usePedidosAcesso`. Todos leem `serverTimestamp` pendente como estimativa.
 - `src/componentes/`: Layout (cabeçalho, menu e rodapé), Logo, Modal, Confirmar, Aviso, Carregando, EtiquetaPapel, EtiquetaSituacao.
-- `src/lib/colunas.js`: colunas da exportação e `camposFaltando`.
+- `src/lib/colunas.js`: colunas da exportação e `camposFaltando`. `src/lib/resumo.js`: números dos cartões. `src/lib/excel.js`: exportação Excel.
+- `src/telas/semana/Semana.jsx`; componentes `CartoesResumo`, `SeletorSemana` e `SeletorMes`.
 - `src/telas/demandas/`: `Demandas.jsx` (tabela, filtros, juntar), `FormEditarDemanda.jsx` e `operacoes.js` (salvar, excluir, juntar, renumerar).
 - `src/telas/cronometro/`: `MeuCronometro.jsx` (página), `Visor.jsx`, `FormDemanda.jsx` (nome com busca e campos), `ListaHoje.jsx`, `EquipeAgora.jsx`, `novaDemanda.js` (monta e valida a demanda nova) e `acoes.js` (iniciar, pausar, concluir, almoço).
 - `src/telas/`: Login, EmBreve e `admin/`:
@@ -346,6 +347,14 @@ Demandas (Fase 4):
 - Juntar: a demanda escolhida fica com os campos dela; soma o tempo e as sessões, mantém a entrega mais recente, a solicitação mais antiga, e as outras datas (ajustes e a outra entrega) vão para `datasAjuste`. A outra é excluída. Não junta se alguma estiver com cronômetro rodando.
 - `.tabela-moldura` tem `position: relative` para o texto oculto dos cabeçalhos não esticar a página.
 
+Semana e exportação (Fase 5):
+
+- Semana de segunda a sábado (`inicioDaSemana`; domingo fica com a semana que terminou). As demandas entram pelo dia da `dataEntrega` (último dia trabalhado), com a consulta de intervalo `dataEntrega >= segunda` e `<= sábado` (um campo só, sem índice composto). O filtro de pessoa é feito na tela.
+- Cartões do topo (`CartoesResumo`, usado também no Painel): total de horas, número de demandas, tempo economizado com IA (soma do economizado mínimo das demandas com Uso de IA "Sim", com o máximo como "até") e % de demandas com Uso de IA "Sim". Cálculo em `src/lib/resumo.js`.
+- Excel com ExcelJS (`src/lib/excel.js`, carregado sob demanda), porque o SheetJS gratuito não grava cores nem fontes. `gerarPlanilha(ExcelJS, ...)` monta o arquivo e dá para testar no Node; `exportarExcel` baixa.
+- Arquivo: uma aba por pessoa (A1 nome, A2 cargo, A3 período, cabeçalho na linha 4) e a aba "Equipe" com a coluna extra "Responsável" no fim. Cabeçalho com fundo #001780, texto branco, Lato em negrito; tempos e datas como texto (HH:MM:SS e DD/MM/AAAA), igual à planilha original. O importador lê esse arquivo de volta sem perder nada.
+- Exportar Semana e Exportar mês levam sempre todas as pessoas do período, mesmo com filtro na tela. Nomes: `Cronometro_Semana_DD-MM_a_DD-MM.xlsx` e `Cronometro_Mes_MM-AAAA.xlsx`.
+
 ## Estado atual
 
 - Fase 1 pronta: projeto React + Vite + Firebase, login com Google, pedido de acesso, cabeçalho e menu por papel, tela de Administração. As outras telas aparecem como "em breve".
@@ -354,4 +363,5 @@ Demandas (Fase 4):
 - Fase 2 pronta: importação da planilha e edição de tipos e palavras-chave na Administração. Testada com a planilha real e um Firestore simulado; a importação no Firestore de verdade ainda não foi feita.
 - Fase 3 pronta: tela Meu Cronômetro (visor, busca para retomar, preenchimento automático, Iniciar, Pausar, Concluir, Almoço, demandas de hoje e Equipe agora). Testada com um Firestore simulado.
 - Fase 4 pronta: tela Demandas (tabela por mês, filtros, edição, exclusão, juntar, renumeração).
+- Fase 5 pronta: tela Semana, Exportar Excel (semana) e Exportar mês (Demandas).
 - Faltam os arquivos da Klavika em `public/fontes/`. Enquanto não existirem, os títulos usam Lato Black.

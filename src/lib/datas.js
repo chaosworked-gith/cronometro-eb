@@ -95,3 +95,29 @@ export function formatarAjuste(datas) {
   if (mesmoMes) partes[partes.length - 1] += `/${lista[0].slice(5, 7)}`;
   return partes.length === 1 ? partes[0] : `${partes.slice(0, -1).join(', ')} e ${partes.at(-1)}`;
 }
+
+const NOMES_DIAS = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+
+function diaDaSemana(iso) {
+  return new Date(`${iso}T00:00:00Z`).getUTCDay();
+}
+
+// Semana de trabalho: segunda a sábado. Domingo fica com a semana que acabou de terminar.
+export function inicioDaSemana(iso) {
+  return somarDias(iso, -((diaDaSemana(iso) + 6) % 7));
+}
+
+export function diasDaSemana(segunda) {
+  return Array.from({ length: 6 }, (_, i) => somarDias(segunda, i));
+}
+
+// "2026-10-26" vira "Segunda-feira, 26/10"
+export function rotuloDia(iso) {
+  return `${NOMES_DIAS[diaDaSemana(iso)]}, ${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+}
+
+// "26/10 a 31/10/2026"
+export function rotuloSemana(segunda) {
+  const sabado = somarDias(segunda, 5);
+  return `${formatarData(segunda).slice(0, 5)} a ${formatarData(sabado)}`;
+}

@@ -1975,6 +1975,148 @@ input[type='checkbox'] {
   }
 }
 
+/* ---------- Semana e cartões de resumo ---------- */
+.pagina-acoes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pagina-acoes .filtro select {
+  height: 48px;
+  min-width: 180px;
+}
+
+.cartoes-resumo {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.cartao-resumo {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 24px;
+  border-radius: var(--raio);
+  background: var(--gradiente-principal);
+  box-shadow: var(--sombra-cartao);
+  color: var(--branco);
+}
+
+.cartao-resumo::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 64px;
+  background: url('/marca/patterns/Pattern_EB_faixa.png') left top / 100% auto repeat-y;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.cartao-resumo > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cartao-resumo-rotulo {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Klavika Bold; sem o arquivo, Lato Black */
+.cartao-resumo-valor {
+  font-family: var(--fonte-destaque);
+  font-weight: 900;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.1;
+}
+
+.cartao-resumo-detalhe {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+}
+
+.dias-semana {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.dia-topo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.dia-topo h2 {
+  color: var(--azul-marinho);
+  font-weight: 900;
+  font-size: 20px;
+}
+
+.lista-dia {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-dia li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--borda);
+}
+
+.lista-dia li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.lista-dia .lista-hoje-tempo {
+  font-size: 15px;
+}
+
+@media (max-width: 1100px) {
+  .cartoes-resumo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dias-semana {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .pagina-acoes {
+    width: 100%;
+  }
+
+  .pagina-acoes > * {
+    flex: 1 1 100%;
+  }
+
+  .pagina-acoes .filtro select {
+    width: 100%;
+  }
+
+  .cartao-resumo {
+    padding: 16px;
+  }
+}
+
 /* ---------- Celular ---------- */
 @media (max-width: 760px) {
   .cabecalho {
