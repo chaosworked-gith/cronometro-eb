@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Sparkles, X } from 'lucide-react';
 import Aviso from '../../componentes/Aviso';
 import EtiquetaSituacao from '../../componentes/EtiquetaSituacao';
+import { explicarSugestao } from '../../lib/classificacao';
 import { OPCOES_PUBLICO, OPCOES_SOLICITANTE } from '../../lib/regras';
 import { formatarHMS } from '../../lib/tempo';
 import { normalizar } from '../../lib/texto';
@@ -22,12 +23,12 @@ function Alternador({ rotulo, nome, valor, aoMudar }) {
   );
 }
 
-function Selecao({ rotulo, valor, opcoes, aoMudar, vazio, ajuda }) {
+function Selecao({ rotulo, valor, opcoes, aoMudar, vazio, ajuda, alerta }) {
   const fora = valor && !opcoes.includes(valor);
   return (
-    <label className="campo">
+    <label className={`campo${alerta ? ' campo-alerta' : ''}`}>
       <span>{rotulo}</span>
-      <select value={valor} onChange={(e) => aoMudar(e.target.value)}>
+      <select value={valor} onChange={(e) => aoMudar(e.target.value)} aria-invalid={alerta || undefined}>
         {!valor && <option value="">{vazio}</option>}
         {fora && <option value={valor}>{valor} (não cadastrado)</option>}
         {opcoes.map((o) => (
@@ -38,6 +39,21 @@ function Selecao({ rotulo, valor, opcoes, aoMudar, vazio, ajuda }) {
       </select>
       {ajuda && <small className="ajuda">{ajuda}</small>}
     </label>
+  );
+}
+
+// Outros tipos possíveis, como etiquetas clicáveis (escolher uma vale como troca à mão)
+function Alternativas({ tipos, aoEscolher }) {
+  if (!tipos.length) return null;
+  return (
+    <div className="alternativas">
+      <span className="texto-secundario">Outras opções:</span>
+      {tipos.map((t) => (
+        <button key={t} type="button" className="etiqueta-opcao" onClick={() => aoEscolher(t)}>
+          {t}
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -94,8 +110,17 @@ export default function FormDemanda({ nome, aoMudarNome, abertas, escolhida, aoE
     );
   }
 
-  const { dados, palavraSugerida, regra } = nova;
+  const { dados, sugestao, tipoManual, regra } = nova;
   const nomesDeTipos = tipos.map((t) => t.nome);
+  const semTipo = !dados.tipo;
+  let ajudaTipo = null;
+  if (tipoManual) ajudaTipo = 'Escolhido por você. A sugestão não muda mais o tipo desta demanda.';
+  else if (semTipo) ajudaTipo = 'Nenhuma pista no nome. Escolha o tipo.';
+  else ajudaTipo = `${explicarSugestao(sugestao)}.`;
+  // Até 3 outros tipos possíveis; com o tipo escolhido à mão, a sugestão volta a aparecer como opção
+  const alternativas = [...(sugestao.tipo ? [sugestao.tipo] : []), ...sugestao.alternativas]
+    .filter((t) => t !== dados.tipo)
+    .slice(0, 3);
 
   return (
     <div className="form-demanda">
@@ -176,8 +201,10 @@ export default function FormDemanda({ nome, aoMudarNome, abertas, escolhida, aoE
                 opcoes={nomesDeTipos}
                 vazio="Escolha o tipo"
                 aoMudar={(v) => aoMudarCampo('tipo', v)}
-                ajuda={palavraSugerida ? `Sugerido pela palavra-chave "${palavraSugerida.palavra}".` : null}
+                ajuda={ajudaTipo}
+                alerta={semTipo}
               />
+              <Alternativas tipos={alternativas} aoEscolher={(t) => aoMudarCampo('tipo', t)} />
             </div>
             <Selecao
               rotulo="Público"

@@ -32,7 +32,7 @@ function ehLetraOuNumero(caractere) {
 }
 
 // Posição onde o trecho aparece no começo de uma palavra ("card" acha "cards", mas "ia" não acha "diaria")
-function inicioDePalavra(texto, trecho) {
+export function inicioDePalavra(texto, trecho) {
   let i = texto.indexOf(trecho);
   while (i >= 0) {
     if (!ehLetraOuNumero(texto[i - 1])) return i;
@@ -46,20 +46,6 @@ function contemPalavraInteira(texto, palavra) {
     if (!ehLetraOuNumero(texto[i - 1]) && !ehLetraOuNumero(texto[i + palavra.length])) return true;
   }
   return false;
-}
-
-// Tipo sugerido pelas palavras-chave encontradas no nome, sem diferenciar maiúsculas e acentos.
-// Se várias combinam, vale a palavra-chave mais longa (a mais específica).
-export function sugerirTipo(nome, palavrasChave) {
-  const texto = normalizar(nome);
-  if (!texto) return null;
-  let melhor = null;
-  for (const p of palavrasChave) {
-    const chave = normalizar(p.palavra);
-    if (!chave || inicioDePalavra(texto, chave) < 0) continue;
-    if (!melhor || chave.length > normalizar(melhor.palavra).length) melhor = p;
-  }
-  return melhor;
 }
 
 // Regras automáticas, nesta ordem de prioridade: Trello, Reunião de Setor, Claude.

@@ -214,7 +214,12 @@ Um por pessoa: `demandaId`, `inicio` (`serverTimestamp`), `rodando`. O tempo cor
 
 ## Regras de negócio
 
-1. **Tipo sugerido** pelas palavras-chave encontradas no nome da demanda, sem diferenciar maiúsculas e acentos.
+1. **Tipo sugerido** enquanto a pessoa digita o nome, nesta ordem (detalhes em "Sugestão de tipo"):
+   1. Histórico: demandas já registradas com nome parecido (sem maiúsculas, acentos e pontuação, sem nome de pessoa depois de " - " e sem palavras como "de", "do", "da", "para"). Vale o tipo mais usado nelas, com preferência para as da própria pessoa e as mais recentes.
+   2. Palavras-chave: entre as que aparecem no nome, vale a mais longa ("card de reconhecimento" ganha de "card"). Formato de rede social (reels, carrossel, story, stories, post, artigo) ganha de data comemorativa.
+   3. Sem pista: o campo fica em "Escolha o tipo", destacado em #d4121a.
+
+   Embaixo do campo aparece de onde veio a sugestão e até 3 alternativas clicáveis. Se a pessoa trocar o tipo à mão, a sugestão não muda mais o tipo daquela demanda. Mudar o tipo atualiza o Público e a estimativa de tempo.
 2. **Tempo mínimo e máximo** e **público padrão** vêm da tabela `tipos` (`minH` e `maxH` em horas, convertidos para segundos na demanda).
 3. **Prazo cumprido (dias)** = `dataEntrega` menos `dataSolicitacao`.
 4. **Tempo economizado** = maior valor entre zero e (tempo estimado menos tempo gasto), para mínimo e máximo:
@@ -282,17 +287,18 @@ A importação usa a mesma planilha. Conferir o formato das datas e das colunas 
 - `src/lib/datas.js`: datas no fuso `America/Bahia`, datas `"AAAA-MM-DD"` (`dataISO`, `diasEntre`, `formatarData`, `rotuloMes`). `src/lib/erros.js`: mensagens de erro em português.
 - `src/lib/tempo.js`: `formatarHMS`, `lerHMS`, conversão entre horas e segundos.
 - `src/lib/texto.js`: `normalizar` (sem maiúsculas, acentos e espaços repetidos) e `ordenarPorTexto`.
-- `src/lib/regras.js`: opções de Solicitante e Público, `calcularEconomizado`, `calcularPrazo`, `sugerirTipo` (palavras-chave), `regraAutomatica` (Trello, Reunião de Setor, Claude) e `recalcular`.
+- `src/lib/regras.js`: opções de Solicitante e Público, `calcularEconomizado`, `calcularPrazo`, `regraAutomatica` (Trello, Reunião de Setor, Claude), `recalcular` e `inicioDePalavra`.
+- `src/lib/classificacao.js`: sugestão de tipo pelo nome (`criarClassificador`, `explicarSugestao`) e relatório de acerto (`avaliarHistorico`). Não depende do Firebase; dá para testar no Node.
 - `src/lib/planilha.js`: leitura da planilha (não grava nada e não depende do Firebase; recebe o módulo do SheetJS, então dá para testar no Node).
 - `src/lib/marca.js`: `urlMarca(caminho)` para os arquivos de `public/marca/`.
-- `src/hooks/`: `useColecao` (coleção em tempo real), `useConsulta` (consulta só com igualdades), `useDocumento` (um documento), `useAgora` (relógio de 1 segundo), `useAviso` (aviso que some sozinho; erros ficam), `usePedidosAcesso`. Todos leem `serverTimestamp` pendente como estimativa.
+- `src/hooks/`: `useColecao` (coleção em tempo real), `useConsulta` (consulta só com igualdades), `useDocumento` (um documento), `useAgora` (relógio de 1 segundo), `useAviso` (aviso que some sozinho; erros ficam), `usePedidosAcesso`. Todos leem `serverTimestamp` pendente como estimativa. `useHistorico` lê as demandas uma vez (não em tempo real) para a sugestão de tipo e guarda por 30 minutos.
 - `src/componentes/`: Layout (cabeçalho, menu e rodapé), Logo, Modal, Confirmar, Aviso, Carregando, EtiquetaPapel, EtiquetaSituacao.
 - `src/lib/colunas.js`: colunas da exportação e `camposFaltando`. `src/lib/resumo.js`: números dos cartões. `src/lib/excel.js`: exportação Excel.
 - `src/telas/semana/Semana.jsx` e `src/telas/painel/` (`Painel.jsx`, `indicadores.js`); componentes `CartoesResumo`, `Grafico`, `SeletorSemana` e `SeletorMes`.
 - `src/telas/demandas/`: `Demandas.jsx` (tabela, filtros, juntar), `FormEditarDemanda.jsx` e `operacoes.js` (salvar, excluir, juntar, renumerar).
 - `src/telas/cronometro/`: `MeuCronometro.jsx` (página), `Visor.jsx`, `FormDemanda.jsx` (nome com busca e campos), `ListaHoje.jsx`, `novaDemanda.js` (monta e valida a demanda nova) e `acoes.js` (iniciar, pausar, concluir).
 - `src/telas/`: Login e `admin/`:
-  - `Administracao.jsx`: moldura com as abas Pessoas (`/administracao`), Tipos e palavras-chave (`/administracao/tabelas`) e Importar planilha (`/administracao/importar`).
+  - `Administracao.jsx`: moldura com as abas Pessoas (`/administracao`), Tipos e palavras-chave (`/administracao/tabelas`), Importar planilha (`/administracao/importar`) e Testar classificação (`/administracao/classificacao`, em `TestarClassificacao.jsx`).
   - `Pessoas.jsx` e `FormMembro.jsx`: membros e pedidos de acesso.
   - `Tabelas.jsx` e `FormTabelas.jsx`: adicionar, editar e remover tipos e palavras-chave.
   - `Importacao.jsx` e `gravarImportacao.js`: envio da planilha, prévia e gravação.
@@ -334,7 +340,7 @@ Meu Cronômetro (Fase 3):
 - `dataEntrega` é o último dia trabalhado: muda para hoje ao iniciar, retomar, pausar e concluir. Por isso "Minhas demandas de hoje" é a consulta `responsavelEmail == eu` e `dataEntrega == hoje`.
 - Retomar uma demanda que já tem tempo registra o dia em `datasAjuste` (sem repetir). A primeira sessão de uma demanda nova não conta como ajuste.
 - Nome digitado igual (sem maiúsculas e acentos) ao de uma demanda em aberto da pessoa retoma essa demanda; nunca cria outra. Demandas concluídas com o mesmo nome não contam.
-- Demanda nova: `numero` = maior número da pessoa no mês + 1; `mes` do dia de hoje. Tipo sugerido pela palavra-chave que aparece no começo de uma palavra do nome ("card" acha "Cards"); se várias combinam, vale a mais longa. Regras de Trello e Claude valem com a palavra inteira ("Claudete" não conta). Sem regra: Uso de IA Não, Template Não, Solicitante Marketing. O que a pessoa muda à mão sempre vale sobre a sugestão.
+- Demanda nova: `numero` = maior número da pessoa no mês + 1; `mes` do dia de hoje. Tipo sugerido como em "Sugestão de tipo". Regras de Trello e Claude valem com a palavra inteira ("Claudete" não conta). Sem regra: Uso de IA Não, Template Não, Solicitante Marketing. O que a pessoa muda à mão sempre vale sobre a sugestão.
 - Consultas só com igualdades, para não precisar de índice composto: demandas da pessoa com `status == em_andamento`, com `status == pausada` e com `dataEntrega == hoje`; o documento `cronometros/{email}` da própria pessoa; e as coleções `tipos` e `palavrasChave`.
 - Layout: cronômetro e "Minhas demandas de hoje" lado a lado no computador (3 para 2); até 1024px, um abaixo do outro.
 - Ajuste depois da Fase 7: o painel "Equipe agora" e o botão Almoço foram removidos (regras de negócio 11 e 12).
@@ -365,6 +371,17 @@ Painel (Fase 6):
 - Modo apresentação: camada fixa sobre tudo (sem menu) com o gradiente premium, logo branco, cartões translúcidos com números brancos, gráficos em cartões brancos (para manter o texto #000000) com letras maiores e #EnergiaBahiana no rodapé. Pede tela cheia ao navegador; Esc ou "Sair" fecham.
 - Sem mascotes no Painel.
 
+Sugestão de tipo (depois da Fase 7):
+
+- Código em `src/lib/classificacao.js`. Só sugere tipos que existem na tabela `tipos`; demandas do histórico com tipo fora da tabela (ou combinado, como "A / B") não contam.
+- Comparação de nomes: sem maiúsculas, acentos e pontuação; sem "de", "do", "da", "para" e parecidas; sem números soltos; plural e singular iguais ("cards" e "card", "cartões" e "cartão"); sem "(ft. ...)". O trecho depois do último " - " sai quando parece nome de pessoa: até 3 palavras, começa com maiúscula e a primeira palavra é desconhecida (não está nas tabelas e aparece em menos de 3 nomes do histórico).
+- Semelhança = peso das palavras em comum dividido pelo peso de todas as palavras dos dois nomes. Palavra rara pesa mais que palavra comum. Parecida = 50% ou mais (`SEMELHANCA_MINIMA`). Voto de cada parecida = semelhança, vezes 2 se for da própria pessoa, e cai pela metade a cada 90 dias desde a entrega. Vence o tipo com mais peso. Testado com 0,3 a 0,7: abaixo de 0,5 o ganho é pequeno e o histórico atropela as palavras-chave com nomes pouco parecidos.
+- Palavras-chave: procuradas no começo de uma palavra do nome, sem pontuação ("card" acha "Cards"). Vale a mais longa. Formato de rede social é a palavra-chave igual a reels, carrossel, story, stories, post ou artigo (ou que começa com uma delas, como "artigo linkedin"); os formatos que não estão na tabela entram sozinhos, com o tipo das palavras-chave de formato (Conteúdo para Redes Sociais), e valem só com a palavra inteira. Data comemorativa é a palavra-chave que começa com "dia " ou com o nome de um mês ("setembro amarelo"). Se a mais longa for data comemorativa e houver formato no nome, o formato ganha.
+- Alternativas: os outros tipos do histórico (por peso) e das palavras-chave (por tamanho), até 3.
+- Meu Cronômetro lê o histórico dos últimos 12 meses (`dataEntrega >= hoje - 365`, consulta de um campo só) quando a pessoa começa a digitar o nome; não lê nada se ela só retomar uma demanda. A Administração lê tudo.
+- Trocar o tipo à mão (no campo ou numa etiqueta) grava `manual.tipo` e apaga `manual.publico`, para o Público voltar ao padrão do novo tipo.
+- Relatório de acerto: cada demanda é classificada como se fosse nova, com ela mesma fora do histórico. Com a planilha de julho a outubro de 2026 (440 demandas com nome e tipo da tabela): 62% de acerto com histórico e palavras-chave (histórico 86%, palavras-chave 58%, 69 sem sugestão), 67% com o tipo certo entre a sugestão e as alternativas, e 49% só com palavras-chave.
+
 ## Estado atual
 
 - Fase 1 pronta: projeto React + Vite + Firebase, login com Google, pedido de acesso, cabeçalho e menu por papel, tela de Administração.
@@ -377,5 +394,6 @@ Painel (Fase 6):
 - Fase 6 pronta: tela Painel com indicadores, 5 gráficos, filtros de período e pessoa, e modo apresentação.
 - Fase 7 pronta: revisão geral. Só as 7 cores da paleta (e transparências delas), só Lato e Klavika (reserva genérica `sans-serif`, sem `system-ui`), nenhum logo em texto, todas as telas sem rolagem lateral no celular, favicon e título conferidos, `public/404.html` para endereços sem #. A tela "em breve" foi removida porque todas as telas existem.
 - Ajuste no Meu Cronômetro: removidos o painel "Equipe agora" e o botão Almoço. A regra de `cronometros` em `firestore.rules` passou a deixar cada pessoa ler só o próprio cronômetro; precisa ser publicada no console do Firebase.
+- Sugestão de tipo pelo histórico e pelas palavras-chave no Meu Cronômetro, e aba Testar classificação (teste de um nome e relatório de acerto) na Administração.
 - Todas as fases foram testadas com um Firestore simulado e dados da planilha real; o uso com o Firestore e as contas de verdade ainda precisa ser conferido pela equipe.
 - Faltam os arquivos da Klavika em `public/fontes/`. Enquanto não existirem, os títulos usam Lato Black.

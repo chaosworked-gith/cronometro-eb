@@ -1,14 +1,16 @@
-import { FileSpreadsheet, Tags, Users } from 'lucide-react';
+import { FileSpreadsheet, FlaskConical, Tags, Users } from 'lucide-react';
 import { Navigate, NavLink, Route, Routes, useOutletContext } from 'react-router-dom';
 import Importacao from './Importacao';
 import Pessoas from './Pessoas';
 import Tabelas from './Tabelas';
+import TestarClassificacao from './TestarClassificacao';
 
 // Caminhos completos: dentro de uma rota com "*", links relativos partem do endereço atual
 const ABAS = [
   { caminho: '/administracao', rotulo: 'Pessoas', icone: Users },
   { caminho: '/administracao/tabelas', rotulo: 'Tipos e palavras-chave', icone: Tags },
   { caminho: '/administracao/importar', rotulo: 'Importar planilha', icone: FileSpreadsheet },
+  { caminho: '/administracao/classificacao', rotulo: 'Testar classificação', icone: FlaskConical },
 ];
 
 export default function Administracao() {
@@ -18,7 +20,7 @@ export default function Administracao() {
     <section className="pagina">
       <div>
         <h1 className="titulo-pagina">Administração</h1>
-        <p className="subtitulo">Pessoas e acessos, tabelas de referência e importação do histórico.</p>
+        <p className="subtitulo">Pessoas e acessos, tabelas de referência, importação do histórico e teste da classificação.</p>
       </div>
 
       <nav className="abas" aria-label="Seções da administração">
@@ -35,6 +37,7 @@ export default function Administracao() {
         <Route index element={<Pessoas />} />
         <Route path="tabelas" element={<Tabelas />} />
         <Route path="importar" element={<Importacao />} />
+        <Route path="classificacao" element={<TestarClassificacao />} />
         <Route path="*" element={<Navigate to="/administracao" replace />} />
       </Routes>
     </section>

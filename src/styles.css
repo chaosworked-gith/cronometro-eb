@@ -1353,6 +1353,45 @@ input[type='checkbox'] {
   background: var(--azul-marinho);
 }
 
+/* Tipo sem nenhuma pista no nome: destaque em vermelho até a pessoa escolher */
+.campo-alerta select {
+  border-color: var(--vermelho);
+  box-shadow: 0 0 0 1px var(--vermelho);
+}
+
+.campo-alerta .ajuda {
+  color: var(--vermelho);
+  font-weight: 700;
+}
+
+/* Outros tipos possíveis, clicáveis */
+.alternativas {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.etiqueta-opcao {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: var(--raio-etiqueta);
+  background: var(--linha-alternada);
+  color: var(--azul-marinho);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: filter var(--transicao), transform var(--transicao);
+}
+
+.etiqueta-opcao:hover {
+  filter: brightness(0.92);
+  transform: translateY(-1px);
+}
+
 /* Nome da demanda com busca nas demandas em aberto */
 .form-demanda {
   display: flex;
@@ -2212,6 +2251,98 @@ input[type='checkbox'] {
     padding-left: 0;
     border-left: 0;
   }
+}
+
+/* ---------- Testar classificação (Administração) ---------- */
+.secao h3 {
+  margin-right: auto;
+  font-weight: 900;
+  font-size: 18px;
+  color: var(--azul-marinho);
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--azul-marinho);
+  cursor: pointer;
+}
+
+.campo-inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.explicacao {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.explicacao-tipo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  border-left: 4px solid var(--azul-brilhante);
+  border-radius: var(--raio);
+  background: var(--fundo-suave);
+}
+
+.explicacao-tipo strong {
+  color: var(--azul-marinho);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.explicacao-tipo.sem-tipo {
+  border-left-color: var(--vermelho);
+  background: var(--vermelho-suave);
+}
+
+.explicacao-tipo.sem-tipo strong {
+  color: var(--vermelho);
+}
+
+.explicacao-bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lista-votos,
+.lista-palavras {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.lista-palavras li {
+  overflow-wrap: anywhere;
+}
+
+.lista-palavras .etiqueta {
+  margin-left: 8px;
+}
+
+.etiqueta-clara {
+  background: var(--linha-alternada);
+  color: var(--azul-marinho);
+}
+
+.tabela-compacta td {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.celula-alerta {
+  color: var(--vermelho);
+  font-weight: 700;
 }
 
 /* ---------- Celular ---------- */

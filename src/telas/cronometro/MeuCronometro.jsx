@@ -7,7 +7,9 @@ import useAviso from '../../hooks/useAviso';
 import useColecao from '../../hooks/useColecao';
 import useConsulta from '../../hooks/useConsulta';
 import useDocumento from '../../hooks/useDocumento';
-import { diaISO } from '../../lib/datas';
+import useHistorico from '../../hooks/useHistorico';
+import { criarClassificador } from '../../lib/classificacao';
+import { diaISO, somarDias } from '../../lib/datas';
 import { mensagemDeErro } from '../../lib/erros';
 import { formatarHMS } from '../../lib/tempo';
 import { normalizar, ordenarPorTexto } from '../../lib/texto';
@@ -67,7 +69,15 @@ export default function MeuCronometro() {
   const outrasAbertas = abertas.filter((d) => d.id !== atual?.id);
   const escolhida = outrasAbertas.find((d) => d.id === escolhidaId) ?? null;
   const exata = !escolhida && nome.trim() ? outrasAbertas.find((d) => normalizar(d.nome) === normalizar(nome)) ?? null : null;
-  const nova = montarNovaDemanda({ nome, manual, tipos: tipos.itens ?? [], palavras: palavras.itens ?? [], hoje });
+
+  // Sugestão de tipo: histórico dos últimos 12 meses (lido quando a pessoa começa a digitar) e palavras-chave
+  const historico = useHistorico(formVisivel && !!nome.trim(), somarDias(hoje, -365));
+  const classificador = useMemo(
+    () => criarClassificador({ demandas: historico.itens ?? [], palavras: palavras.itens ?? [], tipos: tipos.itens ?? [], hoje }),
+    [historico.itens, palavras.itens, tipos.itens, hoje],
+  );
+  const sugestao = useMemo(() => classificador.classificar(nome, { email }), [classificador, nome, email]);
+  const nova = montarNovaDemanda({ nome, manual, tipos: tipos.itens ?? [], sugestao, hoje });
   const alvo = formVisivel ? escolhida ?? exata ?? (nome.trim() ? 'nova' : null) : null;
 
   const livre = !carregando && !ocupado;
@@ -132,8 +142,10 @@ export default function MeuCronometro() {
     if (!valor.trim()) setManual({});
   }
 
+  // Trocar o tipo à mão fixa o tipo e devolve o Público ao padrão do novo tipo
   function mudarCampo(campo, valor) {
     if (campo === null) setManual({});
+    else if (campo === 'tipo') setManual(({ publico: _publico, ...m }) => ({ ...m, tipo: valor }));
     else setManual((m) => ({ ...m, [campo]: valor }));
   }
 

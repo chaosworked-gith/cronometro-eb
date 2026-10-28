@@ -1,12 +1,12 @@
-import { regraAutomatica, sugerirTipo } from '../../lib/regras';
+import { regraAutomatica } from '../../lib/regras';
 import { horasParaSegundos } from '../../lib/tempo';
 import { normalizar } from '../../lib/texto';
 
-// Monta a demanda nova a partir do nome: tipo pela palavra-chave, público e tempos pela tabela de tipos
-// e as regras de Trello, Reunião de Setor e Claude. O que a pessoa mudou à mão (manual) sempre vale.
-export function montarNovaDemanda({ nome, manual, tipos, palavras, hoje }) {
-  const palavraSugerida = manual.tipo ? null : sugerirTipo(nome, palavras);
-  const nomeDoTipo = manual.tipo ?? palavraSugerida?.tipo ?? '';
+// Monta a demanda nova a partir do nome: tipo sugerido (sugestao, de src/lib/classificacao.js), público e
+// tempos pela tabela de tipos e as regras de Trello, Reunião de Setor e Claude. O que a pessoa mudou à mão
+// (manual) sempre vale: com o tipo escolhido à mão, a sugestão não muda mais o tipo.
+export function montarNovaDemanda({ nome, manual, tipos, sugestao, hoje }) {
+  const nomeDoTipo = manual.tipo ?? sugestao.tipo ?? '';
   const tipo = tipos.find((t) => normalizar(t.nome) === normalizar(nomeDoTipo));
   const regra = regraAutomatica(nome, nomeDoTipo);
 
@@ -22,7 +22,8 @@ export function montarNovaDemanda({ nome, manual, tipos, palavras, hoje }) {
       tempoMinSeg: horasParaSegundos(tipo?.minH),
       tempoMaxSeg: horasParaSegundos(tipo?.maxH),
     },
-    palavraSugerida,
+    sugestao,
+    tipoManual: manual.tipo != null,
     regra,
   };
 }
