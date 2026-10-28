@@ -1137,18 +1137,12 @@ input[type='checkbox'] {
 }
 
 /* ---------- Meu Cronômetro ---------- */
+/* Cronômetro e "Minhas demandas de hoje" lado a lado no computador, um abaixo do outro em telas menores */
 .cronometro-grade {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   gap: 24px;
   align-items: start;
-}
-
-.cronometro-principal {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  min-width: 0;
 }
 
 .cartao-cronometro {
@@ -1357,13 +1351,6 @@ input[type='checkbox'] {
 
 .btn-concluir {
   background: var(--azul-marinho);
-}
-
-.cronometro-rodape {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px 16px;
 }
 
 /* Nome da demanda com busca nas demandas em aberto */
@@ -1632,75 +1619,9 @@ input[type='checkbox'] {
   font-size: 18px;
 }
 
-/* Equipe agora */
-.equipe-agora {
-  position: sticky;
-  top: 24px;
-}
-
-.badge-azul {
-  background: var(--azul-brilhante);
-}
-
-.lista-equipe {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.lista-equipe li {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.avatar {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  padding: 7px;
-  border-radius: 50%;
-  background: var(--linha-alternada);
-  object-fit: contain;
-}
-
-.equipe-texto {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.equipe-texto strong {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.equipe-demanda {
-  overflow-wrap: anywhere;
-}
-
-.equipe-tempo {
-  color: var(--azul-brilhante);
-  font-weight: 700;
-}
-
-.equipe-parados {
-  padding-top: 12px;
-  border-top: 1px solid var(--borda);
-}
-
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   .cronometro-grade {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .equipe-agora {
-    position: static;
   }
 }
 

@@ -27,12 +27,6 @@ export function calcularPrazo(dataSolicitacao, dataEntrega) {
   return diasEntre(dataSolicitacao, dataEntrega);
 }
 
-export const TIPO_ALMOCO = 'Horário do Almoço';
-
-export function ehAlmoco(tipo) {
-  return normalizar(tipo) === normalizar(TIPO_ALMOCO);
-}
-
 function ehLetraOuNumero(caractere) {
   return !!caractere && /[a-z0-9]/.test(caractere);
 }

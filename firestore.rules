@@ -61,8 +61,7 @@ service cloud.firestore {
       allow delete: if admin();
     }
     match /cronometros/{email} {
-      allow read: if membro();
-      allow write: if podeEscrever() && email == meuEmail();
+      allow read, write: if podeEscrever() && email == meuEmail();
     }
   }
 }

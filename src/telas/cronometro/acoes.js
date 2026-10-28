@@ -1,9 +1,7 @@
 import { arrayUnion, collection, doc, getDocs, query, serverTimestamp, Timestamp, where, writeBatch } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { diaISO } from '../../lib/datas';
-import { calcularEconomizado, calcularPrazo, ehAlmoco, TIPO_ALMOCO } from '../../lib/regras';
-import { horasParaSegundos } from '../../lib/tempo';
-import { normalizar } from '../../lib/texto';
+import { calcularEconomizado, calcularPrazo } from '../../lib/regras';
 
 // Ações do Meu Cronômetro. Cada uma grava a demanda e o cronometros/{email} no mesmo lote.
 // ctx: { email, nome, cronometro (documento ou null), atual (demanda do cronômetro ou null) }
@@ -31,12 +29,12 @@ function camposAoFecharSessao(demanda, inicio, status) {
   };
 }
 
-// Encerra o cronômetro que está rodando. Almoço é sempre concluído; o resto fica pausado.
+// Encerra o cronômetro que está rodando (a demanda fica pausada, se não for concluída).
 // Devolve o tempo gasto total gravado na demanda.
 function encerrarAtual(lote, ctx, status = 'pausada') {
   const { cronometro, atual } = ctx;
   if (!cronometro?.rodando || !cronometro.inicio || !atual) return atual?.tempoGastoSeg ?? 0;
-  const campos = camposAoFecharSessao(atual, cronometro.inicio, ehAlmoco(atual.tipo) ? 'concluida' : status);
+  const campos = camposAoFecharSessao(atual, cronometro.inicio, status);
   lote.update(refDemanda(atual.id), campos);
   return campos.tempoGastoSeg;
 }
@@ -112,9 +110,7 @@ export async function iniciarNova(dados, ctx) {
 export async function pausar(ctx) {
   const lote = writeBatch(db);
   encerrarAtual(lote, ctx);
-  // Almoço pausado já fica concluído, então não continua como demanda atual
-  const demandaId = ctx.atual && !ehAlmoco(ctx.atual.tipo) ? ctx.atual.id : null;
-  lote.set(refCronometro(ctx.email), { demandaId, inicio: null, rodando: false });
+  lote.set(refCronometro(ctx.email), { demandaId: ctx.atual?.id ?? null, inicio: null, rodando: false });
   await lote.commit();
 }
 
@@ -136,24 +132,4 @@ export async function concluir(ctx) {
   lote.set(refCronometro(ctx.email), { demandaId: null, inicio: null, rodando: false });
   await lote.commit();
   return total;
-}
-
-// Botão rápido: pausa o que estiver rodando e começa o almoço com o tipo Horário do Almoço
-export async function iniciarAlmoco(ctx, tipos) {
-  if (ctx.cronometro?.rodando && ehAlmoco(ctx.atual?.tipo)) return;
-  const tipo = tipos.find((t) => normalizar(t.nome) === normalizar(TIPO_ALMOCO));
-  await iniciarNova(
-    {
-      nome: 'Almoço',
-      tipo: tipo?.nome ?? TIPO_ALMOCO,
-      publico: tipo?.publico ?? 'Interno',
-      usoIA: 'Não',
-      usoTemplate: 'Não',
-      solicitante: 'Marketing',
-      dataSolicitacao: diaISO(),
-      tempoMinSeg: horasParaSegundos(tipo?.minH),
-      tempoMaxSeg: horasParaSegundos(tipo?.maxH),
-    },
-    ctx,
-  );
 }

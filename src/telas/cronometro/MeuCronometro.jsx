@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { CircleCheck, Pause, Play, Plus, Utensils } from 'lucide-react';
+import { CircleCheck, Pause, Play, Plus } from 'lucide-react';
 import { useAuth } from '../../auth/AuthProvider';
 import Aviso from '../../componentes/Aviso';
 import useAgora from '../../hooks/useAgora';
@@ -9,11 +9,9 @@ import useConsulta from '../../hooks/useConsulta';
 import useDocumento from '../../hooks/useDocumento';
 import { diaISO } from '../../lib/datas';
 import { mensagemDeErro } from '../../lib/erros';
-import { ehAlmoco } from '../../lib/regras';
 import { formatarHMS } from '../../lib/tempo';
 import { normalizar, ordenarPorTexto } from '../../lib/texto';
-import { concluir, iniciarAlmoco, iniciarExistente, iniciarNova, pausar } from './acoes';
-import EquipeAgora from './EquipeAgora';
+import { concluir, iniciarExistente, iniciarNova, pausar } from './acoes';
 import FormDemanda from './FormDemanda';
 import ListaHoje from './ListaHoje';
 import { montarNovaDemanda, validarNovaDemanda } from './novaDemanda';
@@ -29,7 +27,7 @@ function segundosHoje(demandas, hoje) {
 }
 
 // O tempo corre a partir do "inicio" salvo em cronometros/{email}: fechar a aba ou trocar de
-// computador não perde nada. Cada pessoa tem um cronômetro só.
+// computador não perde nada. Cada pessoa tem um cronômetro só e vê só o seu.
 export default function MeuCronometro() {
   const { perfil } = useAuth();
   const email = perfil.email;
@@ -37,11 +35,9 @@ export default function MeuCronometro() {
   const hoje = diaISO(agora);
 
   const { dado: cronometro } = useDocumento('cronometros', email);
-  const emAndamento = useConsulta('demandas', [['status', '==', 'em_andamento']]);
+  const emAndamento = useConsulta('demandas', [['responsavelEmail', '==', email], ['status', '==', 'em_andamento']]);
   const pausadas = useConsulta('demandas', [['responsavelEmail', '==', email], ['status', '==', 'pausada']]);
   const deHoje = useConsulta('demandas', [['responsavelEmail', '==', email], ['dataEntrega', '==', hoje]]);
-  const cronometros = useColecao('cronometros');
-  const membros = useColecao('membros');
   const tipos = useColecao('tipos', ordenarTipos);
   const palavras = useColecao('palavrasChave');
 
@@ -55,8 +51,8 @@ export default function MeuCronometro() {
   const carregando = cronometro === undefined || !emAndamento.itens || !pausadas.itens;
 
   const abertas = useMemo(
-    () => [...(emAndamento.itens ?? []).filter((d) => d.responsavelEmail === email), ...(pausadas.itens ?? [])],
-    [emAndamento.itens, pausadas.itens, email],
+    () => [...(emAndamento.itens ?? []), ...(pausadas.itens ?? [])],
+    [emAndamento.itens, pausadas.itens],
   );
 
   const atual = (cronometro?.demandaId && abertas.find((d) => d.id === cronometro.demandaId)) || null;
@@ -76,13 +72,12 @@ export default function MeuCronometro() {
 
   const livre = !carregando && !ocupado;
   const podeIniciar = livre && (alvo != null || (atual && !rodando));
-  const almocoRodando = rodando && ehAlmoco(atual.tipo);
 
   let legenda = '';
   if (alvo === 'nova') legenda = `Iniciar cria a demanda "${nova.dados.nome}"`;
   else if (alvo) legenda = `Iniciar retoma "${alvo.nome}"`;
   else if (atual && !rodando) legenda = `Iniciar retoma "${atual.nome}"`;
-  if (legenda && alvo && rodando) legenda += almocoRodando ? ' e conclui o almoço' : ` e pausa "${atual.nome}"`;
+  if (legenda && alvo && rodando) legenda += ` e pausa "${atual.nome}"`;
 
   const ctx = { email, nome: perfil.nome, cronometro, atual };
 
@@ -131,13 +126,6 @@ export default function MeuCronometro() {
     );
   }
 
-  function clicarAlmoco() {
-    executar(
-      () => iniciarAlmoco(ctx, tipos.itens ?? []),
-      'Bom almoço! Na volta, é só iniciar a próxima demanda ou concluir o almoço.',
-    );
-  }
-
   function mudarNome(valor) {
     setNome(valor);
     setEscolhidaId(null);
@@ -165,88 +153,70 @@ export default function MeuCronometro() {
       )}
 
       <div className="cronometro-grade">
-        <div className="cronometro-principal">
-          <div className="cartao cartao-cronometro">
-            <Visor atual={atual} rodando={rodando} totalSeg={totalSeg} sessaoSeg={sessaoSeg} hojeSeg={hojeSeg} carregando={carregando} />
+        <div className="cartao cartao-cronometro">
+          <Visor atual={atual} rodando={rodando} totalSeg={totalSeg} sessaoSeg={sessaoSeg} hojeSeg={hojeSeg} carregando={carregando} />
 
-            <div className="cronometro-controles">
-              {formVisivel ? (
-                <>
-                  {atual && (
-                    <div className="trocando-topo">
-                      <strong>Começar ou retomar outra demanda</strong>
-                      <button type="button" className="btn btn-link" onClick={limparForm}>
-                        Cancelar
-                      </button>
-                    </div>
-                  )}
-                  <FormDemanda
-                    nome={nome}
-                    aoMudarNome={mudarNome}
-                    abertas={outrasAbertas}
-                    escolhida={escolhida}
-                    aoEscolher={(d) => setEscolhidaId(d?.id ?? null)}
-                    exata={exata}
-                    nova={nova}
-                    manual={manual}
-                    aoMudarCampo={mudarCampo}
-                    tipos={tipos.itens ?? []}
-                  />
-                </>
-              ) : (
-                <button type="button" className="btn btn-secundario btn-trocar" onClick={() => setTrocando(true)}>
-                  <Plus size={18} />
-                  Começar outra demanda
-                </button>
-              )}
+          <div className="cronometro-controles">
+            {formVisivel ? (
+              <>
+                {atual && (
+                  <div className="trocando-topo">
+                    <strong>Começar ou retomar outra demanda</strong>
+                    <button type="button" className="btn btn-link" onClick={limparForm}>
+                      Cancelar
+                    </button>
+                  </div>
+                )}
+                <FormDemanda
+                  nome={nome}
+                  aoMudarNome={mudarNome}
+                  abertas={outrasAbertas}
+                  escolhida={escolhida}
+                  aoEscolher={(d) => setEscolhidaId(d?.id ?? null)}
+                  exata={exata}
+                  nova={nova}
+                  manual={manual}
+                  aoMudarCampo={mudarCampo}
+                  tipos={tipos.itens ?? []}
+                />
+              </>
+            ) : (
+              <button type="button" className="btn btn-secundario btn-trocar" onClick={() => setTrocando(true)}>
+                <Plus size={18} />
+                Começar outra demanda
+              </button>
+            )}
 
-              {legenda && <p className="legenda-iniciar">{legenda}.</p>}
+            {legenda && <p className="legenda-iniciar">{legenda}.</p>}
 
-              <div className="botoes-cronometro">
-                <button type="button" className="btn btn-acao btn-iniciar" onClick={clicarIniciar} disabled={!podeIniciar}>
-                  <Play size={20} />
-                  Iniciar
-                </button>
-                <button type="button" className="btn btn-acao btn-pausar" onClick={() => executar(() => pausar(ctx))} disabled={!livre || !rodando}>
-                  <Pause size={20} />
-                  Pausar
-                </button>
-                <button type="button" className="btn btn-acao btn-concluir" onClick={clicarConcluir} disabled={!livre || !atual}>
-                  <CircleCheck size={20} />
-                  Concluir
-                </button>
-              </div>
-
-              <div className="cronometro-rodape">
-                <button type="button" className="btn btn-secundario" onClick={clicarAlmoco} disabled={!livre || almocoRodando}>
-                  <Utensils size={18} />
-                  Almoço
-                </button>
-                <span className="texto-secundario">
-                  Iniciar outra demanda pausa a atual. O almoço é concluído quando você volta.
-                </span>
-              </div>
+            <div className="botoes-cronometro">
+              <button type="button" className="btn btn-acao btn-iniciar" onClick={clicarIniciar} disabled={!podeIniciar}>
+                <Play size={20} />
+                Iniciar
+              </button>
+              <button type="button" className="btn btn-acao btn-pausar" onClick={() => executar(() => pausar(ctx))} disabled={!livre || !rodando}>
+                <Pause size={20} />
+                Pausar
+              </button>
+              <button type="button" className="btn btn-acao btn-concluir" onClick={clicarConcluir} disabled={!livre || !atual}>
+                <CircleCheck size={20} />
+                Concluir
+              </button>
             </div>
-          </div>
 
-          <ListaHoje
-            demandas={deHoje.itens ?? []}
-            atualId={atual?.id}
-            rodando={rodando}
-            sessaoSeg={sessaoSeg}
-            hojeSeg={hojeSeg}
-            hoje={hoje}
-            aoRetomar={(d) => executar(() => iniciarExistente(d, ctx))}
-            ocupado={!livre}
-          />
+            <p className="texto-secundario">Iniciar outra demanda pausa a atual.</p>
+          </div>
         </div>
 
-        <EquipeAgora
-          cronometros={cronometros.itens}
-          demandasEmAndamento={emAndamento.itens}
-          membros={membros.itens}
-          agora={agora}
-          emailProprio={email}
+        <ListaHoje
+          demandas={deHoje.itens ?? []}
+          atualId={atual?.id}
+          rodando={rodando}
+          sessaoSeg={sessaoSeg}
+          hojeSeg={hojeSeg}
+          hoje={hoje}
+          aoRetomar={(d) => executar(() => iniciarExistente(d, ctx))}
+          ocupado={!livre}
         />
       </div>
     </section>

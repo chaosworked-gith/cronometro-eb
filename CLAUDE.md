@@ -202,7 +202,7 @@ Pedidos de acesso: `nome`, `email`, `criadoEm`.
 
 ### `cronometros/{email}`
 
-Um por pessoa: `demandaId`, `inicio` (`serverTimestamp`), `rodando`. O tempo corrido é calculado a partir de `inicio`, então o cronômetro continua certo se a pessoa recarregar a página, fechar a aba ou trocar de aparelho.
+Um por pessoa: `demandaId`, `inicio` (`serverTimestamp`), `rodando`. O tempo corrido é calculado a partir de `inicio`, então o cronômetro continua certo se a pessoa recarregar a página, fechar a aba ou trocar de aparelho. Só a própria pessoa (admin ou equipe) lê e grava o seu; a regra do Firestore bloqueia a leitura do cronômetro de outra pessoa.
 
 ### `tipos/{id}`
 
@@ -232,6 +232,8 @@ Um por pessoa: `demandaId`, `inicio` (`serverTimestamp`), `rodando`. O tempo cor
 8. **Todos os tempos** exibidos como `HH:MM:SS`. Totais podem passar de 24 horas (ex.: `31:05:10`).
 9. **Opções de Solicitante**: Marketing, RH, Diretoria, Comercial, Financeiro, Logística, Marketing / RH.
 10. **Opções de Público**: Interno, Externo, Interno e Externo, Endomarketing, Atividades de Rotina.
+11. **Ninguém vê o cronômetro de outra pessoa.** Cada pessoa vê só o próprio cronômetro. Não existe painel "Equipe agora" nem qualquer tela que mostre quem está cronometrando o quê; o app não lê `cronometros` de outros membros (e a regra do Firestore não deixa). Não recriar isso em fases futuras.
+12. **Não existe botão de almoço.** O tipo "Horário do Almoço" continua na tabela `tipos` e pode ser escolhido como qualquer outro, mas sem botão, atalho ou regra especial (o almoço pausa e conclui como qualquer demanda). Não recriar em fases futuras.
 
 ## Exportação Excel
 
@@ -280,7 +282,7 @@ A importação usa a mesma planilha. Conferir o formato das datas e das colunas 
 - `src/lib/datas.js`: datas no fuso `America/Bahia`, datas `"AAAA-MM-DD"` (`dataISO`, `diasEntre`, `formatarData`, `rotuloMes`). `src/lib/erros.js`: mensagens de erro em português.
 - `src/lib/tempo.js`: `formatarHMS`, `lerHMS`, conversão entre horas e segundos.
 - `src/lib/texto.js`: `normalizar` (sem maiúsculas, acentos e espaços repetidos) e `ordenarPorTexto`.
-- `src/lib/regras.js`: opções de Solicitante e Público, `calcularEconomizado`, `calcularPrazo`, `sugerirTipo` (palavras-chave), `regraAutomatica` (Trello, Reunião de Setor, Claude), `ehAlmoco` e `TIPO_ALMOCO`.
+- `src/lib/regras.js`: opções de Solicitante e Público, `calcularEconomizado`, `calcularPrazo`, `sugerirTipo` (palavras-chave), `regraAutomatica` (Trello, Reunião de Setor, Claude) e `recalcular`.
 - `src/lib/planilha.js`: leitura da planilha (não grava nada e não depende do Firebase; recebe o módulo do SheetJS, então dá para testar no Node).
 - `src/lib/marca.js`: `urlMarca(caminho)` para os arquivos de `public/marca/`.
 - `src/hooks/`: `useColecao` (coleção em tempo real), `useConsulta` (consulta só com igualdades), `useDocumento` (um documento), `useAgora` (relógio de 1 segundo), `useAviso` (aviso que some sozinho; erros ficam), `usePedidosAcesso`. Todos leem `serverTimestamp` pendente como estimativa.
@@ -288,7 +290,7 @@ A importação usa a mesma planilha. Conferir o formato das datas e das colunas 
 - `src/lib/colunas.js`: colunas da exportação e `camposFaltando`. `src/lib/resumo.js`: números dos cartões. `src/lib/excel.js`: exportação Excel.
 - `src/telas/semana/Semana.jsx` e `src/telas/painel/` (`Painel.jsx`, `indicadores.js`); componentes `CartoesResumo`, `Grafico`, `SeletorSemana` e `SeletorMes`.
 - `src/telas/demandas/`: `Demandas.jsx` (tabela, filtros, juntar), `FormEditarDemanda.jsx` e `operacoes.js` (salvar, excluir, juntar, renumerar).
-- `src/telas/cronometro/`: `MeuCronometro.jsx` (página), `Visor.jsx`, `FormDemanda.jsx` (nome com busca e campos), `ListaHoje.jsx`, `EquipeAgora.jsx`, `novaDemanda.js` (monta e valida a demanda nova) e `acoes.js` (iniciar, pausar, concluir, almoço).
+- `src/telas/cronometro/`: `MeuCronometro.jsx` (página), `Visor.jsx`, `FormDemanda.jsx` (nome com busca e campos), `ListaHoje.jsx`, `novaDemanda.js` (monta e valida a demanda nova) e `acoes.js` (iniciar, pausar, concluir).
 - `src/telas/`: Login e `admin/`:
   - `Administracao.jsx`: moldura com as abas Pessoas (`/administracao`), Tipos e palavras-chave (`/administracao/tabelas`) e Importar planilha (`/administracao/importar`).
   - `Pessoas.jsx` e `FormMembro.jsx`: membros e pedidos de acesso.
@@ -333,9 +335,9 @@ Meu Cronômetro (Fase 3):
 - Retomar uma demanda que já tem tempo registra o dia em `datasAjuste` (sem repetir). A primeira sessão de uma demanda nova não conta como ajuste.
 - Nome digitado igual (sem maiúsculas e acentos) ao de uma demanda em aberto da pessoa retoma essa demanda; nunca cria outra. Demandas concluídas com o mesmo nome não contam.
 - Demanda nova: `numero` = maior número da pessoa no mês + 1; `mes` do dia de hoje. Tipo sugerido pela palavra-chave que aparece no começo de uma palavra do nome ("card" acha "Cards"); se várias combinam, vale a mais longa. Regras de Trello e Claude valem com a palavra inteira ("Claudete" não conta). Sem regra: Uso de IA Não, Template Não, Solicitante Marketing. O que a pessoa muda à mão sempre vale sobre a sugestão.
-- Almoço: cria "Almoço" com o tipo Horário do Almoço. O almoço nunca fica pausado: quando termina (pausar, iniciar outra ou concluir), é concluído.
-- Consultas só com igualdades, para não precisar de índice composto: demandas `status == em_andamento` (equipe toda, usada também para "Equipe agora"), demandas da pessoa com `status == pausada`, demandas da pessoa com `dataEntrega == hoje`, e coleções `cronometros`, `membros`, `tipos`, `palavrasChave`.
-- "Equipe agora" mostra só quem está com cronômetro rodando, com o tempo da sessão atual; o resto aparece em "Sem cronômetro agora".
+- Consultas só com igualdades, para não precisar de índice composto: demandas da pessoa com `status == em_andamento`, com `status == pausada` e com `dataEntrega == hoje`; o documento `cronometros/{email}` da própria pessoa; e as coleções `tipos` e `palavrasChave`.
+- Layout: cronômetro e "Minhas demandas de hoje" lado a lado no computador (3 para 2); até 1024px, um abaixo do outro.
+- Ajuste depois da Fase 7: o painel "Equipe agora" e o botão Almoço foram removidos (regras de negócio 11 e 12).
 
 Demandas (Fase 4):
 
@@ -369,10 +371,11 @@ Painel (Fase 6):
 - Fase 1 enviada para a `main` no GitHub. Commits deste repositório assinados como "Ivie" <ivie.cidreira@eletricabahiana.com.br> (configurado só neste repositório).
 - Visual refeito com a identidade #EnergiaBahiana 2026 (login, cabeçalho, menu, Administração).
 - Fase 2 pronta: importação da planilha e edição de tipos e palavras-chave na Administração. Testada com a planilha real e um Firestore simulado; a importação no Firestore de verdade ainda não foi feita.
-- Fase 3 pronta: tela Meu Cronômetro (visor, busca para retomar, preenchimento automático, Iniciar, Pausar, Concluir, Almoço, demandas de hoje e Equipe agora). Testada com um Firestore simulado.
+- Fase 3 pronta: tela Meu Cronômetro (visor, busca para retomar, preenchimento automático, Iniciar, Pausar, Concluir e demandas de hoje). Testada com um Firestore simulado.
 - Fase 4 pronta: tela Demandas (tabela por mês, filtros, edição, exclusão, juntar, renumeração).
 - Fase 5 pronta: tela Semana, Exportar Excel (semana) e Exportar mês (Demandas).
 - Fase 6 pronta: tela Painel com indicadores, 5 gráficos, filtros de período e pessoa, e modo apresentação.
 - Fase 7 pronta: revisão geral. Só as 7 cores da paleta (e transparências delas), só Lato e Klavika (reserva genérica `sans-serif`, sem `system-ui`), nenhum logo em texto, todas as telas sem rolagem lateral no celular, favicon e título conferidos, `public/404.html` para endereços sem #. A tela "em breve" foi removida porque todas as telas existem.
+- Ajuste no Meu Cronômetro: removidos o painel "Equipe agora" e o botão Almoço. A regra de `cronometros` em `firestore.rules` passou a deixar cada pessoa ler só o próprio cronômetro; precisa ser publicada no console do Firebase.
 - Todas as fases foram testadas com um Firestore simulado e dados da planilha real; o uso com o Firestore e as contas de verdade ainda precisa ser conferido pela equipe.
 - Faltam os arquivos da Klavika em `public/fontes/`. Enquanto não existirem, os títulos usam Lato Black.
