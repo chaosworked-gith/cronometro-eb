@@ -1,11 +1,16 @@
+import { lazy, Suspense } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from './auth/AuthProvider';
+import Carregando from './componentes/Carregando';
 import Layout from './componentes/Layout';
 import { telaInicial, telasDoPapel } from './navegacao';
 import Administracao from './telas/admin/Administracao';
 import MeuCronometro from './telas/cronometro/MeuCronometro';
 import Demandas from './telas/demandas/Demandas';
 import Semana from './telas/semana/Semana';
+
+// O Painel carrega o Chart.js; só baixa quando alguém abre a tela
+const Painel = lazy(() => import('./telas/painel/Painel'));
 import EmBreve from './telas/EmBreve';
 import Login from './telas/Login';
 
@@ -15,6 +20,7 @@ const TELAS_PRONTAS = {
   cronometro: MeuCronometro,
   demandas: Demandas,
   semana: Semana,
+  painel: Painel,
 };
 
 // HashRouter porque o GitHub Pages não reescreve rotas (recarregar daria 404).
@@ -39,7 +45,15 @@ function Rotas() {
             <Route
               key={tela.id}
               path={tela.id === 'admin' ? `${tela.caminho}/*` : tela.caminho}
-              element={Tela ? <Tela /> : <EmBreve tela={tela} />}
+              element={
+                Tela ? (
+                  <Suspense fallback={<Carregando />}>
+                    <Tela />
+                  </Suspense>
+                ) : (
+                  <EmBreve tela={tela} />
+                )
+              }
             />
           );
         })}

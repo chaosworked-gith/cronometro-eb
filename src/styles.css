@@ -2117,6 +2117,213 @@ input[type='checkbox'] {
   }
 }
 
+/* ---------- Painel ---------- */
+.painel .titulo-pagina {
+  font-size: 44px;
+}
+
+.painel .subtitulo {
+  font-size: 18px;
+}
+
+.painel-filtros {
+  flex-direction: row;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+}
+
+.painel-filtros .abas {
+  align-self: center;
+}
+
+.painel-filtros .filtro select {
+  height: 48px;
+  min-width: 200px;
+}
+
+.intervalo {
+  display: flex;
+  gap: 12px;
+}
+
+.intervalo input {
+  height: 48px;
+}
+
+.graficos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.grafico-largo {
+  grid-column: 1 / -1;
+}
+
+.cartao-grafico h2 {
+  color: var(--azul-marinho);
+  font-weight: 900;
+  font-size: 22px;
+}
+
+.grafico {
+  position: relative;
+  height: 340px;
+}
+
+.grafico-largo .grafico {
+  height: 320px;
+}
+
+.painel .cartao-resumo-valor {
+  font-size: clamp(32px, 3.4vw, 48px);
+}
+
+/* Modo apresentação: tela cheia, sem menu, sobre o gradiente premium */
+.apresentacao {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 32px 16px;
+  overflow-y: auto;
+  background: var(--gradiente-premium);
+  color: var(--branco);
+}
+
+.apresentacao-topo {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.apresentacao-logo {
+  height: 44px;
+  width: auto;
+}
+
+.apresentacao-titulo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-left: 24px;
+  border-left: 1px solid rgba(255, 255, 255, 0.32);
+}
+
+.apresentacao-titulo strong {
+  font-family: var(--fonte-destaque);
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.apresentacao-titulo span {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 18px;
+}
+
+.cartoes-apresentacao .cartao-resumo {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+.cartoes-apresentacao .cartao-resumo-rotulo {
+  font-size: 17px;
+}
+
+.cartoes-apresentacao .cartao-resumo-valor {
+  font-size: clamp(40px, 4vw, 64px);
+}
+
+.apresentacao .graficos {
+  flex: 1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.apresentacao .grafico-largo {
+  grid-column: span 2;
+}
+
+.apresentacao .cartao-grafico {
+  color: var(--preto);
+}
+
+.apresentacao .cartao-grafico h2 {
+  font-size: 24px;
+}
+
+.apresentacao .grafico {
+  height: 34vh;
+  min-height: 260px;
+}
+
+.apresentacao-rodape {
+  text-align: center;
+}
+
+.apresentacao-rodape .hashtag {
+  font-size: 22px;
+}
+
+@media (max-width: 1100px) {
+  .graficos,
+  .apresentacao .graficos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .apresentacao .grafico-largo {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .painel .titulo-pagina {
+    font-size: 34px;
+  }
+
+  .painel .btn-grande {
+    width: 100%;
+  }
+
+  .painel-filtros .abas,
+  .painel-filtros .seletor-periodo,
+  .painel-filtros .filtro,
+  .intervalo {
+    width: 100%;
+  }
+
+  .painel-filtros .seletor-periodo {
+    justify-content: space-between;
+  }
+
+  .painel-filtros .filtro select {
+    width: 100%;
+  }
+
+  .grafico {
+    height: 300px;
+  }
+
+  .apresentacao {
+    padding: 16px;
+  }
+
+  .apresentacao-topo {
+    flex-wrap: wrap;
+  }
+
+  .apresentacao-titulo {
+    order: 3;
+    flex-basis: 100%;
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
 /* ---------- Celular ---------- */
 @media (max-width: 760px) {
   .cabecalho {

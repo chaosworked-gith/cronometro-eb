@@ -154,7 +154,7 @@ Menu por papel (definido em `src/navegacao.js`):
 | Demandas, Semana, Painel | todos |
 | Administração | admin |
 
-Tela inicial: diretoria abre no Painel; gestor em Demandas; admin e equipe em Meu Cronômetro. Rota que o papel não pode usar volta para a tela inicial.
+Tela inicial: diretoria e gestor abrem no Painel; admin e equipe em Meu Cronômetro. Rota que o papel não pode usar volta para a tela inicial.
 
 ## Dados no Firestore
 
@@ -286,7 +286,7 @@ A importação usa a mesma planilha. Conferir o formato das datas e das colunas 
 - `src/hooks/`: `useColecao` (coleção em tempo real), `useConsulta` (consulta só com igualdades), `useDocumento` (um documento), `useAgora` (relógio de 1 segundo), `useAviso` (aviso que some sozinho; erros ficam), `usePedidosAcesso`. Todos leem `serverTimestamp` pendente como estimativa.
 - `src/componentes/`: Layout (cabeçalho, menu e rodapé), Logo, Modal, Confirmar, Aviso, Carregando, EtiquetaPapel, EtiquetaSituacao.
 - `src/lib/colunas.js`: colunas da exportação e `camposFaltando`. `src/lib/resumo.js`: números dos cartões. `src/lib/excel.js`: exportação Excel.
-- `src/telas/semana/Semana.jsx`; componentes `CartoesResumo`, `SeletorSemana` e `SeletorMes`.
+- `src/telas/semana/Semana.jsx` e `src/telas/painel/` (`Painel.jsx`, `indicadores.js`); componentes `CartoesResumo`, `Grafico`, `SeletorSemana` e `SeletorMes`.
 - `src/telas/demandas/`: `Demandas.jsx` (tabela, filtros, juntar), `FormEditarDemanda.jsx` e `operacoes.js` (salvar, excluir, juntar, renumerar).
 - `src/telas/cronometro/`: `MeuCronometro.jsx` (página), `Visor.jsx`, `FormDemanda.jsx` (nome com busca e campos), `ListaHoje.jsx`, `EquipeAgora.jsx`, `novaDemanda.js` (monta e valida a demanda nova) e `acoes.js` (iniciar, pausar, concluir, almoço).
 - `src/telas/`: Login, EmBreve e `admin/`:
@@ -355,6 +355,14 @@ Semana e exportação (Fase 5):
 - Arquivo: uma aba por pessoa (A1 nome, A2 cargo, A3 período, cabeçalho na linha 4) e a aba "Equipe" com a coluna extra "Responsável" no fim. Cabeçalho com fundo #001780, texto branco, Lato em negrito; tempos e datas como texto (HH:MM:SS e DD/MM/AAAA), igual à planilha original. O importador lê esse arquivo de volta sem perder nada.
 - Exportar Semana e Exportar mês levam sempre todas as pessoas do período, mesmo com filtro na tela. Nomes: `Cronometro_Semana_DD-MM_a_DD-MM.xlsx` e `Cronometro_Mes_MM-AAAA.xlsx`.
 
+Painel (Fase 6):
+
+- Uma consulta só: demandas com `dataEntrega >= 2026-07-01` (`INICIO_HISTORICO` em `src/telas/painel/indicadores.js`). Período (semana, mês ou intervalo) e pessoa são filtrados na tela. A evolução mês a mês agrupa pelo campo `mes` e respeita o filtro de pessoa, mas não o de período.
+- Gráficos com Chart.js (`src/componentes/Grafico.jsx`): fonte Lato, texto #000000, cores pela função `corDaSerie` (as 5 cores da paleta na ordem pedida e depois as mesmas com 60% e 35% de opacidade). Demandas por tipo mostra os 7 tipos mais frequentes e "Outros"; tempo médio por tipo em minutos (a dica mostra HH:MM:SS).
+- A tela é carregada sob demanda (`lazy` em `App.jsx`) para o Chart.js não pesar nas outras telas.
+- Modo apresentação: camada fixa sobre tudo (sem menu) com o gradiente premium, logo branco, cartões translúcidos com números brancos, gráficos em cartões brancos (para manter o texto #000000) com letras maiores e #EnergiaBahiana no rodapé. Pede tela cheia ao navegador; Esc ou "Sair" fecham.
+- Sem mascotes no Painel.
+
 ## Estado atual
 
 - Fase 1 pronta: projeto React + Vite + Firebase, login com Google, pedido de acesso, cabeçalho e menu por papel, tela de Administração. As outras telas aparecem como "em breve".
@@ -364,4 +372,5 @@ Semana e exportação (Fase 5):
 - Fase 3 pronta: tela Meu Cronômetro (visor, busca para retomar, preenchimento automático, Iniciar, Pausar, Concluir, Almoço, demandas de hoje e Equipe agora). Testada com um Firestore simulado.
 - Fase 4 pronta: tela Demandas (tabela por mês, filtros, edição, exclusão, juntar, renumeração).
 - Fase 5 pronta: tela Semana, Exportar Excel (semana) e Exportar mês (Demandas).
+- Fase 6 pronta: tela Painel com indicadores, 5 gráficos, filtros de período e pessoa, e modo apresentação.
 - Faltam os arquivos da Klavika em `public/fontes/`. Enquanto não existirem, os títulos usam Lato Black.

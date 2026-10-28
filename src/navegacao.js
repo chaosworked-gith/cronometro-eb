@@ -53,6 +53,7 @@ export function telasDoPapel(papel) {
 }
 
 export function telaInicial(papel) {
-  if (papel === 'diretoria') return '/painel';
+  // Gestor e diretoria entram direto no Painel
+  if (papel === 'diretoria' || papel === 'gestor') return '/painel';
   return telasDoPapel(papel)[0]?.caminho ?? '/painel';
 }
