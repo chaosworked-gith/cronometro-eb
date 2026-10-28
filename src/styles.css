@@ -997,7 +997,9 @@ input[type='checkbox'] {
 }
 
 /* ---------- Tabela ---------- */
+/* position: relative segura o texto oculto (sr-only) dentro da área de rolagem */
 .tabela-moldura {
+  position: relative;
   border-radius: var(--raio);
   overflow: hidden;
 }
@@ -1770,6 +1772,206 @@ input[type='checkbox'] {
 
   .vazio-mascote img {
     height: 140px;
+  }
+}
+
+/* ---------- Demandas ---------- */
+.seletor-periodo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 8px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pilula);
+  color: var(--azul-marinho);
+}
+
+.seletor-periodo strong {
+  min-width: 140px;
+  font-size: 17px;
+  text-align: center;
+}
+
+.filtros {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.4fr);
+  gap: 16px;
+}
+
+.filtro select {
+  width: 100%;
+}
+
+.filtro-busca .busca {
+  max-width: none;
+}
+
+.aviso-faltando {
+  align-items: center;
+}
+
+.tabela-resumo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.juntar-barra {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tabela-rolagem {
+  overflow-x: auto;
+}
+
+.tabela-demandas th {
+  min-width: 96px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  vertical-align: bottom;
+}
+
+.tabela-demandas th:first-child,
+.tabela-demandas th.celula-check {
+  min-width: 0;
+}
+
+.tabela-demandas td {
+  font-size: 14px;
+}
+
+.tabela-demandas td.celula-titulo {
+  min-width: 220px;
+}
+
+.tabela .direita {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.modal-largo {
+  max-width: 760px;
+}
+
+.ajustes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pilula-ajuste {
+  gap: 4px;
+  padding-right: 4px;
+  background: var(--linha-alternada);
+  color: var(--azul-marinho);
+}
+
+.pilula-ajuste::before {
+  display: none;
+}
+
+.pilula-ajuste .btn-icone {
+  width: 20px;
+  height: 20px;
+}
+
+.ajuste-novo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.opcao-juntar {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  cursor: pointer;
+}
+
+.opcao-juntar.ativa {
+  border-color: var(--azul-brilhante);
+  background: var(--fundo-suave);
+}
+
+.opcao-juntar input {
+  margin-top: 4px;
+  accent-color: var(--azul-brilhante);
+}
+
+.opcao-juntar > span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.previa-juncao {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding: 12px 16px;
+  border-radius: var(--raio);
+  background: var(--linha-alternada);
+  color: var(--azul-marinho);
+}
+
+@media (max-width: 1100px) {
+  .filtros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filtro-busca {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 900px) {
+  .tabela-rolagem {
+    overflow-x: visible;
+  }
+
+  /* No cartão, o nome da demanda vem primeiro */
+  .tabela-demandas.tabela-responsiva tr {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tabela-demandas.tabela-responsiva td.celula-titulo {
+    order: -1;
+    min-width: 0;
+  }
+
+  .tabela-demandas.tabela-responsiva td.celula-titulo::before {
+    display: none;
+  }
+
+  .tabela-demandas.tabela-responsiva td.celula-check {
+    order: -2;
+    float: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .filtros {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .filtro-busca {
+    grid-column: auto;
+  }
+
+  .pagina-topo .seletor-periodo {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 

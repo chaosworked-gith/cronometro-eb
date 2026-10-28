@@ -4,6 +4,7 @@ import Layout from './componentes/Layout';
 import { telaInicial, telasDoPapel } from './navegacao';
 import Administracao from './telas/admin/Administracao';
 import MeuCronometro from './telas/cronometro/MeuCronometro';
+import Demandas from './telas/demandas/Demandas';
 import EmBreve from './telas/EmBreve';
 import Login from './telas/Login';
 
@@ -11,6 +12,7 @@ import Login from './telas/Login';
 const TELAS_PRONTAS = {
   admin: Administracao,
   cronometro: MeuCronometro,
+  demandas: Demandas,
 };
 
 // HashRouter porque o GitHub Pages não reescreve rotas (recarregar daria 404).

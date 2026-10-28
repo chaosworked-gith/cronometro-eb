@@ -83,3 +83,12 @@ export function regraAutomatica(nome, tipo) {
   }
   return null;
 }
+
+// Recalcula tempo economizado e prazo depois de mudar tempos ou datas
+export function recalcular(demanda) {
+  return {
+    economizadoMinSeg: calcularEconomizado(demanda.tempoMinSeg, demanda.tempoGastoSeg),
+    economizadoMaxSeg: calcularEconomizado(demanda.tempoMaxSeg, demanda.tempoGastoSeg),
+    prazoDias: calcularPrazo(demanda.dataSolicitacao, demanda.dataEntrega),
+  };
+}

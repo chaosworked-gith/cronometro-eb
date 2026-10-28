@@ -285,6 +285,8 @@ A importação usa a mesma planilha. Conferir o formato das datas e das colunas 
 - `src/lib/marca.js`: `urlMarca(caminho)` para os arquivos de `public/marca/`.
 - `src/hooks/`: `useColecao` (coleção em tempo real), `useConsulta` (consulta só com igualdades), `useDocumento` (um documento), `useAgora` (relógio de 1 segundo), `useAviso` (aviso que some sozinho; erros ficam), `usePedidosAcesso`. Todos leem `serverTimestamp` pendente como estimativa.
 - `src/componentes/`: Layout (cabeçalho, menu e rodapé), Logo, Modal, Confirmar, Aviso, Carregando, EtiquetaPapel, EtiquetaSituacao.
+- `src/lib/colunas.js`: colunas da exportação e `camposFaltando`.
+- `src/telas/demandas/`: `Demandas.jsx` (tabela, filtros, juntar), `FormEditarDemanda.jsx` e `operacoes.js` (salvar, excluir, juntar, renumerar).
 - `src/telas/cronometro/`: `MeuCronometro.jsx` (página), `Visor.jsx`, `FormDemanda.jsx` (nome com busca e campos), `ListaHoje.jsx`, `EquipeAgora.jsx`, `novaDemanda.js` (monta e valida a demanda nova) e `acoes.js` (iniciar, pausar, concluir, almoço).
 - `src/telas/`: Login, EmBreve e `admin/`:
   - `Administracao.jsx`: moldura com as abas Pessoas (`/administracao`), Tipos e palavras-chave (`/administracao/tabelas`) e Importar planilha (`/administracao/importar`).
@@ -334,6 +336,16 @@ Meu Cronômetro (Fase 3):
 - Consultas só com igualdades, para não precisar de índice composto: demandas `status == em_andamento` (equipe toda, usada também para "Equipe agora"), demandas da pessoa com `status == pausada`, demandas da pessoa com `dataEntrega == hoje`, e coleções `cronometros`, `membros`, `tipos`, `palavrasChave`.
 - "Equipe agora" mostra só quem está com cronômetro rodando, com o tempo da sessão atual; o resto aparece em "Sem cronômetro agora".
 
+Demandas (Fase 4):
+
+- Colunas da exportação definidas uma vez em `src/lib/colunas.js` (`COLUNAS_DEMANDA`), usadas pela tela e pelo Excel. O título da coluna do número é "Nº", como na planilha original (o importador aceita "No" e "Nº").
+- Tabela por mês (consulta `mes == AAAA-MM`, equipe toda) com Situação e Responsável antes das colunas da exportação. Filtros por responsável, tipo, público, solicitante e busca no nome ficam na tela, sem nova consulta.
+- Linha sem Uso de IA, Template ou Solicitante fica em vermelho claro, com "Falta" na célula; o aviso no topo conta essas demandas e tem "Mostrar só essas".
+- Admin e equipe editam (inclusive mês, responsável e tempo gasto); tempo gasto e situação ficam travados enquanto o cronômetro roda. Só admin exclui e junta (as regras do Firestore só deixam admin apagar).
+- Renumeração (`src/telas/demandas/operacoes.js`): mudar mês ou responsável manda a demanda para o fim do novo grupo e renumera o antigo; excluir e juntar renumeram o grupo. O Nº fica 1, 2, 3... sem buracos, mantendo a ordem.
+- Juntar: a demanda escolhida fica com os campos dela; soma o tempo e as sessões, mantém a entrega mais recente, a solicitação mais antiga, e as outras datas (ajustes e a outra entrega) vão para `datasAjuste`. A outra é excluída. Não junta se alguma estiver com cronômetro rodando.
+- `.tabela-moldura` tem `position: relative` para o texto oculto dos cabeçalhos não esticar a página.
+
 ## Estado atual
 
 - Fase 1 pronta: projeto React + Vite + Firebase, login com Google, pedido de acesso, cabeçalho e menu por papel, tela de Administração. As outras telas aparecem como "em breve".
@@ -341,4 +353,5 @@ Meu Cronômetro (Fase 3):
 - Visual refeito com a identidade #EnergiaBahiana 2026 (login, cabeçalho, menu, Administração, telas em breve).
 - Fase 2 pronta: importação da planilha e edição de tipos e palavras-chave na Administração. Testada com a planilha real e um Firestore simulado; a importação no Firestore de verdade ainda não foi feita.
 - Fase 3 pronta: tela Meu Cronômetro (visor, busca para retomar, preenchimento automático, Iniciar, Pausar, Concluir, Almoço, demandas de hoje e Equipe agora). Testada com um Firestore simulado.
+- Fase 4 pronta: tela Demandas (tabela por mês, filtros, edição, exclusão, juntar, renumeração).
 - Faltam os arquivos da Klavika em `public/fontes/`. Enquanto não existirem, os títulos usam Lato Black.

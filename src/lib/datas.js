@@ -77,3 +77,21 @@ export function rotuloMes(mes) {
   const [ano, numero] = mes.split('-').map(Number);
   return `${nomeDoMes(numero)} ${ano}`;
 }
+
+// "2026-10" mais n meses
+export function somarMeses(mes, n) {
+  const [ano, numero] = mes.split('-').map(Number);
+  const data = new Date(Date.UTC(ano, numero - 1 + n, 1));
+  return data.toISOString().slice(0, 7);
+}
+
+// Ajuste exibido como "DD e DD/MM" quando as datas são do mesmo mês ("03, 05 e 07/10");
+// com meses diferentes, cada data leva o mês ("28/09 e 02/10").
+export function formatarAjuste(datas) {
+  const lista = [...new Set(datas ?? [])].sort();
+  if (!lista.length) return '';
+  const mesmoMes = lista.every((d) => d.slice(0, 7) === lista[0].slice(0, 7));
+  const partes = lista.map((d) => (mesmoMes ? d.slice(8, 10) : `${d.slice(8, 10)}/${d.slice(5, 7)}`));
+  if (mesmoMes) partes[partes.length - 1] += `/${lista[0].slice(5, 7)}`;
+  return partes.length === 1 ? partes[0] : `${partes.slice(0, -1).join(', ')} e ${partes.at(-1)}`;
+}
