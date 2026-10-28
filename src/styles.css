@@ -60,8 +60,8 @@
   --brilho-circuito: 0 0 8px rgba(0, 55, 255, 0.6);
   --transicao: 200ms ease-out;
 
-  --fonte: 'Lato', system-ui, sans-serif;
-  --fonte-destaque: 'Klavika', 'Lato', system-ui, sans-serif;
+  --fonte: 'Lato', sans-serif;
+  --fonte-destaque: 'Klavika', 'Lato', sans-serif;
 }
 
 *,
@@ -239,11 +239,6 @@ select {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
-}
-
-.etiqueta-destaque {
-  background: var(--azul-brilhante);
-  color: var(--branco);
 }
 
 .etiqueta-suave {
@@ -928,32 +923,6 @@ input[type='checkbox'] {
   background: var(--azul-brilhante);
   box-shadow: var(--brilho-circuito);
   transition: width var(--transicao);
-}
-
-/* Em breve */
-.em-breve {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 48px 24px;
-  text-align: center;
-}
-
-.em-breve-icone {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--gradiente-principal);
-  color: var(--branco);
-  box-shadow: var(--brilho-circuito);
-}
-
-.em-breve p {
-  max-width: 440px;
 }
 
 /* Pedidos de acesso */

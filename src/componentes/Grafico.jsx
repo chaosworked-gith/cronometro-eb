@@ -27,7 +27,7 @@ Chart.register(
   PointElement,
   Tooltip,
 );
-Chart.defaults.font.family = "'Lato', system-ui, sans-serif";
+Chart.defaults.font.family = "'Lato', sans-serif";
 Chart.defaults.font.size = 14;
 Chart.defaults.color = '#000000';
 

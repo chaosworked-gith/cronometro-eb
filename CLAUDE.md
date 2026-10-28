@@ -33,7 +33,7 @@ Cronômetro de Atividades da equipe de marketing da Elétrica Bahiana (EB).
 
 ### Cuidados conhecidos
 
-- O GitHub Pages não reescreve rotas: recarregar uma página interna (ex.: `/cronometro-eb/painel`) dá erro 404. Usar `HashRouter` ou navegação sem caminhos na URL.
+- O GitHub Pages não reescreve rotas. Por isso o app usa `HashRouter` (`/cronometro-eb/#/painel`): recarregar qualquer tela funciona. Um endereço sem # (ex.: `/cronometro-eb/painel`) cai em `public/404.html`, que leva para `/cronometro-eb/#/painel`.
 - O `authDomain` (`cronometro-eb.firebaseapp.com`) é diferente do domínio publicado (`github.io`). Em navegadores que bloqueiam armazenamento de terceiros (Safari e versões recentes do Chrome), o `signInWithRedirect` pode não concluir o login. Por isso o popup é o caminho principal e o redirecionamento é a alternativa. Testar no celular.
 - React Router 7: dentro de uma rota com `*` (como `/administracao/*`), links relativos partem do endereço atual. Usar caminhos completos nos `NavLink` dessas telas.
 - Para remover acentos, usar `normalize('NFD').replace(/\p{M}/gu, '')` (em `src/lib/texto.js`). Evitar escapes Unicode da faixa U+0300 a U+036F escritos com barra invertida em código gerado por ferramenta: eles podem virar o próprio caractere invisível.
@@ -289,7 +289,7 @@ A importação usa a mesma planilha. Conferir o formato das datas e das colunas 
 - `src/telas/semana/Semana.jsx` e `src/telas/painel/` (`Painel.jsx`, `indicadores.js`); componentes `CartoesResumo`, `Grafico`, `SeletorSemana` e `SeletorMes`.
 - `src/telas/demandas/`: `Demandas.jsx` (tabela, filtros, juntar), `FormEditarDemanda.jsx` e `operacoes.js` (salvar, excluir, juntar, renumerar).
 - `src/telas/cronometro/`: `MeuCronometro.jsx` (página), `Visor.jsx`, `FormDemanda.jsx` (nome com busca e campos), `ListaHoje.jsx`, `EquipeAgora.jsx`, `novaDemanda.js` (monta e valida a demanda nova) e `acoes.js` (iniciar, pausar, concluir, almoço).
-- `src/telas/`: Login, EmBreve e `admin/`:
+- `src/telas/`: Login e `admin/`:
   - `Administracao.jsx`: moldura com as abas Pessoas (`/administracao`), Tipos e palavras-chave (`/administracao/tabelas`) e Importar planilha (`/administracao/importar`).
   - `Pessoas.jsx` e `FormMembro.jsx`: membros e pedidos de acesso.
   - `Tabelas.jsx` e `FormTabelas.jsx`: adicionar, editar e remover tipos e palavras-chave.
@@ -365,12 +365,14 @@ Painel (Fase 6):
 
 ## Estado atual
 
-- Fase 1 pronta: projeto React + Vite + Firebase, login com Google, pedido de acesso, cabeçalho e menu por papel, tela de Administração. As outras telas aparecem como "em breve".
+- Fase 1 pronta: projeto React + Vite + Firebase, login com Google, pedido de acesso, cabeçalho e menu por papel, tela de Administração.
 - Fase 1 enviada para a `main` no GitHub. Commits deste repositório assinados como "Ivie" <ivie.cidreira@eletricabahiana.com.br> (configurado só neste repositório).
-- Visual refeito com a identidade #EnergiaBahiana 2026 (login, cabeçalho, menu, Administração, telas em breve).
+- Visual refeito com a identidade #EnergiaBahiana 2026 (login, cabeçalho, menu, Administração).
 - Fase 2 pronta: importação da planilha e edição de tipos e palavras-chave na Administração. Testada com a planilha real e um Firestore simulado; a importação no Firestore de verdade ainda não foi feita.
 - Fase 3 pronta: tela Meu Cronômetro (visor, busca para retomar, preenchimento automático, Iniciar, Pausar, Concluir, Almoço, demandas de hoje e Equipe agora). Testada com um Firestore simulado.
 - Fase 4 pronta: tela Demandas (tabela por mês, filtros, edição, exclusão, juntar, renumeração).
 - Fase 5 pronta: tela Semana, Exportar Excel (semana) e Exportar mês (Demandas).
 - Fase 6 pronta: tela Painel com indicadores, 5 gráficos, filtros de período e pessoa, e modo apresentação.
+- Fase 7 pronta: revisão geral. Só as 7 cores da paleta (e transparências delas), só Lato e Klavika (reserva genérica `sans-serif`, sem `system-ui`), nenhum logo em texto, todas as telas sem rolagem lateral no celular, favicon e título conferidos, `public/404.html` para endereços sem #. A tela "em breve" foi removida porque todas as telas existem.
+- Todas as fases foram testadas com um Firestore simulado e dados da planilha real; o uso com o Firestore e as contas de verdade ainda precisa ser conferido pela equipe.
 - Faltam os arquivos da Klavika em `public/fontes/`. Enquanto não existirem, os títulos usam Lato Black.

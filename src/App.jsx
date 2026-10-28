@@ -11,11 +11,10 @@ import Semana from './telas/semana/Semana';
 
 // O Painel carrega o Chart.js; só baixa quando alguém abre a tela
 const Painel = lazy(() => import('./telas/painel/Painel'));
-import EmBreve from './telas/EmBreve';
 import Login from './telas/Login';
 
-// Telas já construídas; as outras aparecem como "em breve"
-const TELAS_PRONTAS = {
+// Componente de cada tela do menu
+const TELAS = {
   admin: Administracao,
   cronometro: MeuCronometro,
   demandas: Demandas,
@@ -40,19 +39,15 @@ function Rotas() {
     <Routes>
       <Route element={<Layout />}>
         {telasDoPapel(perfil.papel).map((tela) => {
-          const Tela = TELAS_PRONTAS[tela.id];
+          const Tela = TELAS[tela.id];
           return (
             <Route
               key={tela.id}
               path={tela.id === 'admin' ? `${tela.caminho}/*` : tela.caminho}
               element={
-                Tela ? (
-                  <Suspense fallback={<Carregando />}>
-                    <Tela />
-                  </Suspense>
-                ) : (
-                  <EmBreve tela={tela} />
-                )
+                <Suspense fallback={<Carregando />}>
+                  <Tela />
+                </Suspense>
               }
             />
           );

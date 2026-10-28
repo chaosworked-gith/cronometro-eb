@@ -9,7 +9,6 @@ export const TELAS = [
     rotuloCurto: 'Cronômetro',
     icone: Timer,
     papeis: ['admin', 'equipe'],
-    descricao: 'Aqui você vai iniciar, pausar e concluir as suas demandas.',
   },
   {
     id: 'demandas',
@@ -18,7 +17,6 @@ export const TELAS = [
     rotuloCurto: 'Demandas',
     icone: ListChecks,
     papeis: PAPEIS,
-    descricao: 'Lista das demandas da equipe, com filtros e exportação para Excel.',
   },
   {
     id: 'semana',
@@ -27,7 +25,6 @@ export const TELAS = [
     rotuloCurto: 'Semana',
     icone: CalendarDays,
     papeis: PAPEIS,
-    descricao: 'Resumo da semana de trabalho, de segunda a sábado.',
   },
   {
     id: 'painel',
@@ -36,7 +33,6 @@ export const TELAS = [
     rotuloCurto: 'Painel',
     icone: LayoutDashboard,
     papeis: PAPEIS,
-    descricao: 'Gráficos e indicadores da equipe de marketing.',
   },
   {
     id: 'admin',
