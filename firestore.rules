@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logado() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower().matches('.*@eletricabahiana[.]com[.]br$');
+    }
+    function meuEmail() {
+      return request.auth.token.email.lower();
+    }
+    function cadastrado() {
+      return exists(/databases/$(database)/documents/membros/$(meuEmail()));
+    }
+    function meuCadastro() {
+      return get(/databases/$(database)/documents/membros/$(meuEmail())).data;
+    }
+    function membro() {
+      return logado() && cadastrado() && meuCadastro().ativo == true;
+    }
+    function admin() {
+      return membro() && meuCadastro().papel == 'admin';
+    }
+    function podeEscrever() {
+      return membro() && meuCadastro().papel in ['admin', 'equipe'];
+    }
+    function cadastroValido() {
+      return request.resource.data.papel in ['admin', 'equipe', 'gestor', 'diretoria']
+        && request.resource.data.ativo is bool
+        && request.resource.data.nome is string;
+    }
+
+    match /membros/{email} {
+      allow read: if membro() || (logado() && email == meuEmail());
+      allow create: if admin() && email == email.lower() && cadastroValido();
+      allow update: if admin() && cadastroValido()
+        && (email != meuEmail()
+            || (request.resource.data.papel == 'admin' && request.resource.data.ativo == true));
+      allow delete: if false;
+    }
+
+    match /solicitacoes/{email} {
+      allow create: if logado() && email == meuEmail() && !cadastrado();
+      allow read: if admin() || (logado() && email == meuEmail());
+      allow delete: if admin();
+      allow update: if false;
+    }
+
+    match /tipos/{id} {
+      allow read: if membro();
+      allow write: if admin();
+    }
+    match /palavrasChave/{id} {
+      allow read: if membro();
+      allow write: if admin();
+    }
+    match /demandas/{id} {
+      allow read: if membro();
+      allow create, update: if podeEscrever();
+      allow delete: if admin();
+    }
+    match /cronometros/{email} {
+      allow read: if membro();
+      allow write: if podeEscrever() && email == meuEmail();
+    }
+  }
+}
