@@ -24,7 +24,7 @@ Cronômetro de Atividades da equipe de marketing da Elétrica Bahiana (EB).
 - React + Vite. O `base` do Vite deve ser `"/cronometro-eb/"`.
 - Firebase: Authentication (login com Google) e Firestore.
 - Chart.js para gráficos.
-- SheetJS (`xlsx`) para importar e exportar Excel.
+- SheetJS (`xlsx`) para importar e exportar Excel. Instalado do CDN oficial (`https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz`), não do registro do npm, que parou na 0.18.5 e tem falhas de segurança conhecidas. Carregado sob demanda (`await import('xlsx')`) para não pesar no resto do app.
 - Ícones Lucide.
 - Hospedagem no GitHub Pages, com publicação automática por GitHub Actions.
 - Login com `signInWithPopup`. Se falhar no celular, usar `signInWithRedirect`.
@@ -35,6 +35,8 @@ Cronômetro de Atividades da equipe de marketing da Elétrica Bahiana (EB).
 
 - O GitHub Pages não reescreve rotas: recarregar uma página interna (ex.: `/cronometro-eb/painel`) dá erro 404. Usar `HashRouter` ou navegação sem caminhos na URL.
 - O `authDomain` (`cronometro-eb.firebaseapp.com`) é diferente do domínio publicado (`github.io`). Em navegadores que bloqueiam armazenamento de terceiros (Safari e versões recentes do Chrome), o `signInWithRedirect` pode não concluir o login. Por isso o popup é o caminho principal e o redirecionamento é a alternativa. Testar no celular.
+- React Router 7: dentro de uma rota com `*` (como `/administracao/*`), links relativos partem do endereço atual. Usar caminhos completos nos `NavLink` dessas telas.
+- Para remover acentos, usar `normalize('NFD').replace(/\p{M}/gu, '')` (em `src/lib/texto.js`). Evitar escapes Unicode da faixa U+0300 a U+036F escritos com barra invertida em código gerado por ferramenta: eles podem virar o próprio caractere invisível.
 
 ## Firebase
 
@@ -156,6 +158,13 @@ Tela inicial: diretoria abre no Painel; gestor em Demandas; admin e equipe em Me
 
 ## Dados no Firestore
 
+Formatos (decididos na Fase 2):
+
+- Datas de demanda (`dataSolicitacao`, `datasAjuste`, `dataEntrega`) são texto `"AAAA-MM-DD"`, sem hora. `datasAjuste` vem em ordem e sem repetição.
+- Tempos de demanda em segundos inteiros. Tempos de tipo (`minH`, `maxH`) em horas decimais.
+- Valor desconhecido é `null` (ex.: `usoIA`, `solicitante` ou `dataSolicitacao` que a planilha não trazia). Não inventar valor.
+- `numero` da planilha é mantido como está (pode ter saltos, como em outubro de 2026).
+
 ### `membros/{email}`
 
 O ID do documento é o e-mail em minúsculas.
@@ -268,10 +277,19 @@ A importação usa a mesma planilha. Conferir o formato das datas e das colunas 
 - `src/auth/AuthProvider.jsx`: login, cadastro em tempo real e pedido de acesso. Expõe `useAuth()` com `status` (`carregando`, `deslogado`, `sem_cadastro`, `pedido_enviado`, `inativo`, `cadastro_invalido`, `erro`, `ativo`), `perfil` e as ações.
 - `src/permissoes.js`: domínio, papéis, rótulos e `podeEscrever(papel)`.
 - `src/navegacao.js`: telas do menu, quem vê cada uma e a tela inicial do papel.
-- `src/lib/datas.js`: datas no fuso `America/Bahia`. `src/lib/erros.js`: mensagens de erro em português.
+- `src/lib/datas.js`: datas no fuso `America/Bahia`, datas `"AAAA-MM-DD"` (`dataISO`, `diasEntre`, `formatarData`, `rotuloMes`). `src/lib/erros.js`: mensagens de erro em português.
+- `src/lib/tempo.js`: `formatarHMS`, `lerHMS`, conversão entre horas e segundos.
+- `src/lib/texto.js`: `normalizar` (sem maiúsculas, acentos e espaços repetidos) e `ordenarPorTexto`.
+- `src/lib/regras.js`: opções de Solicitante e Público, `calcularEconomizado` e `calcularPrazo`.
+- `src/lib/planilha.js`: leitura da planilha (não grava nada e não depende do Firebase; recebe o módulo do SheetJS, então dá para testar no Node).
 - `src/lib/marca.js`: `urlMarca(caminho)` para os arquivos de `public/marca/`.
+- `src/hooks/`: `useColecao` (coleção em tempo real), `useAviso` (aviso que some sozinho; erros ficam), `usePedidosAcesso`.
 - `src/componentes/`: Layout (cabeçalho, menu e rodapé), Logo, Modal, Confirmar, Aviso, Carregando, EtiquetaPapel.
-- `src/telas/`: Login, EmBreve e `admin/` (Administracao, FormMembro).
+- `src/telas/`: Login, EmBreve e `admin/`:
+  - `Administracao.jsx`: moldura com as abas Pessoas (`/administracao`), Tipos e palavras-chave (`/administracao/tabelas`) e Importar planilha (`/administracao/importar`).
+  - `Pessoas.jsx` e `FormMembro.jsx`: membros e pedidos de acesso.
+  - `Tabelas.jsx` e `FormTabelas.jsx`: adicionar, editar e remover tipos e palavras-chave.
+  - `Importacao.jsx` e `gravarImportacao.js`: envio da planilha, prévia e gravação.
 - `src/styles.css`: todo o visual. As 7 cores, as transparências permitidas, os gradientes e as cores de situação ficam em variáveis no `:root`; usar sempre as variáveis.
 - `Logo` recebe `versao` (`horizontal-branco`, `vertical-branco`, `horizontal-azul`, `vertical-azul`, `icone-branco`, `icone-azul`) e, se quiser, `versaoCelular` (o cabeçalho usa o ícone no celular).
 
@@ -289,9 +307,22 @@ Decisões já tomadas:
 - Cadastro (`membros/{email}`) e pedido (`solicitacoes/{email}`) são lidos em tempo real: quando um admin libera o acesso, a tela de quem pediu abre sozinha.
 - No celular (até 760px) o menu vira barra de abas com nomes curtos; tabelas viram cartões abaixo de 900px.
 
+Importação da planilha (Fase 2):
+
+- Aba mensal é reconhecida pelo cabeçalho (tem "Tipo de Demanda", "Nome da Demanda" e "Tempo Gasto"), não pelo nome. O mês vem do nome da aba ("Julho 2026" vira `"2026-07"`); se não der, do mês mais comum das entregas. Abas fora do formato (como "Gráficos") ficam de fora e aparecem nas observações.
+- Colunas encontradas pelo nome do cabeçalho, sem acento e sem maiúsculas. Julho e agosto de 2026 não têm Ajuste nem Data de Solicitação preenchida; por isso o prazo desses meses fica `null`.
+- Tempo em texto `HH:MM:SS`, em número decimal de horas nas colunas "(h)" (0.5 = 00:30:00) ou em hora do Excel (formato de hora). Datas em `DD/MM/AAAA`, número de série do Excel ou várias datas na célula ("08/07 e 09/07/2026", "23, 24 e 25/09"): o mês e o ano que faltam vêm da parte seguinte. Várias datas na entrega: a última é a entrega e as outras viram ajustes.
+- Linha sem nome e sem tempo é ignorada. Linha com tempo e sem nome entra com o nome vazio e aparece nas observações.
+- Tempo estimado e público que faltam na linha vêm da tabela de tipos. Tempo economizado e prazo são sempre recalculados. "Marketing/RH" e variações viram a grafia oficial da lista.
+- Tipos e palavras-chave com o mesmo nome (sem diferenciar acento) são atualizados; os outros, criados. Demandas sempre criadas, como `concluida`, no nome do responsável escolhido (padrão: Ivie).
+- Duplicidade: antes de gravar, conta as demandas do responsável por mês. Mês que já tem demandas aparece em vermelho e começa desmarcado.
+- Gravação em lotes de 200. Se der erro no meio, o aviso diz quantos registros chegaram a ser gravados.
+- Renomear um tipo atualiza as palavras-chave ligadas a ele; remover um tipo remove as palavras-chave ligadas. As demandas nunca mudam com isso.
+
 ## Estado atual
 
 - Fase 1 pronta: projeto React + Vite + Firebase, login com Google, pedido de acesso, cabeçalho e menu por papel, tela de Administração. As outras telas aparecem como "em breve".
 - Fase 1 enviada para a `main` no GitHub. Commits deste repositório assinados como "Ivie" <ivie.cidreira@eletricabahiana.com.br> (configurado só neste repositório).
 - Visual refeito com a identidade #EnergiaBahiana 2026 (login, cabeçalho, menu, Administração, telas em breve).
+- Fase 2 pronta: importação da planilha e edição de tipos e palavras-chave na Administração. Testada com a planilha real e um Firestore simulado; a importação no Firestore de verdade ainda não foi feita.
 - Faltam os arquivos da Klavika em `public/fontes/`. Enquanto não existirem, os títulos usam Lato Black.

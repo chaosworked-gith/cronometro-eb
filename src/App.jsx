@@ -25,7 +25,7 @@ function Rotas() {
         {telasDoPapel(perfil.papel).map((tela) => (
           <Route
             key={tela.id}
-            path={tela.caminho}
+            path={tela.id === 'admin' ? `${tela.caminho}/*` : tela.caminho}
             element={tela.id === 'admin' ? <Administracao /> : <EmBreve tela={tela} />}
           />
         ))}

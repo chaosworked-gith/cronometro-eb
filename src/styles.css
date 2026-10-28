@@ -719,17 +719,23 @@ select {
 .secao-topo {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 8px 16px;
 }
 
+/* O título empurra o resto para a direita; com um contador logo depois, quem empurra é o contador */
 .secao-topo h2 {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-right: auto;
   font-weight: 900;
   font-size: 22px;
   color: var(--azul-marinho);
+}
+
+.secao-topo h2:has(+ .badge) {
+  margin-right: 0;
 }
 
 .secao-topo h2 + .badge {
@@ -738,6 +744,190 @@ select {
 
 .vazio {
   color: var(--texto-secundario);
+}
+
+.vazio a {
+  color: var(--azul-brilhante);
+  font-weight: 700;
+}
+
+.numero {
+  font-variant-numeric: tabular-nums;
+}
+
+.texto-alerta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--vermelho);
+  font-weight: 700;
+}
+
+td .texto-alerta {
+  margin-left: 8px;
+  font-size: 13px;
+}
+
+.tabela-previa td .texto-alerta {
+  margin-left: 0;
+}
+
+/* Abas internas da Administração */
+.abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.aba {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pilula);
+  color: var(--azul-marinho);
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background var(--transicao), color var(--transicao);
+}
+
+.aba:hover {
+  background: var(--fundo-suave);
+}
+
+.aba.ativa {
+  border-color: var(--azul-marinho);
+  background: var(--azul-marinho);
+  color: var(--branco);
+}
+
+/* Busca nas tabelas */
+.busca {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 360px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  color: var(--texto-secundario);
+  transition: border-color var(--transicao), box-shadow var(--transicao);
+}
+
+.busca:focus-within {
+  border-color: var(--azul-brilhante);
+  box-shadow: 0 0 0 3px rgba(0, 55, 255, 0.2);
+}
+
+.busca input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--preto);
+}
+
+/* Envio da planilha */
+.envio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 24px;
+  border: 2px dashed var(--azul-brilhante);
+  border-radius: var(--raio);
+  background: rgba(64, 105, 255, 0.06);
+  color: var(--azul-marinho);
+  text-align: center;
+  cursor: pointer;
+  transition: background var(--transicao), box-shadow var(--transicao);
+}
+
+.envio svg {
+  color: var(--azul-brilhante);
+}
+
+.envio:hover,
+.envio.arrastando {
+  background: var(--linha-alternada);
+  box-shadow: var(--brilho-circuito);
+}
+
+.envio:focus-within {
+  outline: 2px solid var(--azul-medio);
+  outline-offset: 2px;
+}
+
+.campo-responsavel {
+  max-width: 360px;
+}
+
+.campos-lado-a-lado {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--azul-brilhante);
+  cursor: pointer;
+}
+
+.celula-check {
+  width: 48px;
+}
+
+.tabela tbody tr.linha-alerta td {
+  background: var(--vermelho-suave);
+}
+
+.observacoes summary {
+  color: var(--azul-marinho);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.observacoes ul {
+  margin: 8px 0 0;
+  padding-left: 24px;
+  font-size: 14px;
+}
+
+.acoes-importar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.progresso-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progresso {
+  height: 8px;
+  border-radius: var(--raio-pilula);
+  background: var(--fundo-suave);
+  overflow: hidden;
+}
+
+.progresso-barra {
+  height: 100%;
+  border-radius: var(--raio-pilula);
+  background: var(--azul-brilhante);
+  box-shadow: var(--brilho-circuito);
+  transition: width var(--transicao);
 }
 
 /* Em breve */
@@ -1096,6 +1286,14 @@ select {
     font-size: 18px;
   }
 
+  .campos-lado-a-lado {
+    grid-template-columns: 1fr;
+  }
+
+  .acoes-importar .btn {
+    width: 100%;
+  }
+
   .pedido-acoes {
     width: 100%;
   }
@@ -1168,6 +1366,23 @@ select {
     justify-content: flex-start;
     gap: 8px;
     padding-top: 12px;
+  }
+
+  .tabela-responsiva td.celula-titulo {
+    justify-content: flex-start;
+    padding-bottom: 8px;
+    font-size: 17px;
+    text-align: left;
+  }
+
+  .tabela-responsiva td.celula-check {
+    float: left;
+    width: auto;
+    padding: 4px 12px 0 0;
+  }
+
+  .tabela-responsiva td[data-rotulo] {
+    clear: left;
   }
 
   .tabela-responsiva .celula-acoes .btn + .btn {
